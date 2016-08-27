@@ -3,6 +3,7 @@ package at.ac.tuwien.ifs.qse.service;
 import at.ac.tuwien.ifs.qse.model.File;
 import at.ac.tuwien.ifs.qse.model.Issue;
 import at.ac.tuwien.ifs.qse.model.Line;
+import at.ac.tuwien.ifs.qse.model.TestCase;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,6 +17,7 @@ public class ModelAccessService {
 
     private static Map<String, File> files;
     private static Map<String, Issue> issues;
+    private static Map<String, TestCase> testCases;
     private static List<Line> lines;
 
     private ModelAccessService() {
@@ -33,6 +35,13 @@ public class ModelAccessService {
             issues = new HashMap<String, Issue>();
         }
         return issues;
+    }
+
+    public static Map<String, TestCase> getTestCases() {
+        if (testCases == null) {
+            testCases = new HashMap<String, TestCase>();
+        }
+        return testCases;
     }
 
     public static List<Line> getLines(){

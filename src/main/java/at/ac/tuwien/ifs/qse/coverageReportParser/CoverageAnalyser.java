@@ -1,41 +1,35 @@
 package at.ac.tuwien.ifs.qse.coverageReportParser;
 
 import at.ac.tuwien.ifs.qse.model.TestCase;
+import at.ac.tuwien.ifs.qse.service.ModelAccessService;
 
-import java.util.List;
+import java.util.Map;
 
 /**
- * Generates the test report and parses it's information.
  * Generates for each test case a code coverage report and
  * parses it's information.
  *
  */
 public class CoverageAnalyser {
-    private List<TestCase> testcases;
-    public void run(){
-        generateTestReport();
+    private CodeCoverageTool codeCoverageTool;
+    private Map<String, TestCase> testCases;
+
+    public CoverageAnalyser(CodeCoverageTool codeCoverageTool) {
+        this.codeCoverageTool = codeCoverageTool;
+        this.testCases = ModelAccessService.getTestCases();
+    }
+
+    public void analyzeCoverage(){
         analyseTestReport();
-
-        for (TestCase testCase : testcases) {
-            generateCoverageReport(testCase);
-            analyseCoverageReport();
+        for (TestCase testCase : testCases.values()) {
+            codeCoverageTool.analyseCoverageReport(testCase);
         }
-
     }
 
-    private void generateTestReport(){
-        //TODO implement method
-    }
-
+    /**
+     * Generates the test report of the project and analyses it.
+     */
     private void analyseTestReport(){
-        //TODO implement method
-    }
-
-    private void generateCoverageReport(TestCase TestCaseName){
-        //TODO implement method
-    }
-
-    private void analyseCoverageReport(){
         //TODO implement method
     }
 
