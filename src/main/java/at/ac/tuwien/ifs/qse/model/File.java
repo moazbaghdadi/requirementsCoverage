@@ -7,19 +7,19 @@ import java.util.List;
  */
 public class File {
 
-    private String className;
+    private String fileName;
     private List<Line> lines;
 
-    public File(String className) {
-        this.className = className;
+    public File(String fileName) {
+        this.fileName = fileName;
     }
 
-    public String getClassName() {
-        return className;
+    public String getFileName() {
+        return fileName;
     }
 
-    public void setClassName(String className) {
-        this.className = className;
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
     public List<Line> getLines() {

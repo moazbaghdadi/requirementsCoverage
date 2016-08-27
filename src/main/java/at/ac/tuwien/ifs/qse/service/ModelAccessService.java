@@ -23,7 +23,7 @@ public class ModelAccessService {
     private ModelAccessService() {
     }
 
-    public static Map<String, File> getClasses(){
+    public static Map<String, File> getFiles(){
         if (files == null) {
             files = new HashMap<String, File>();
         }

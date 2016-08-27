@@ -9,13 +9,13 @@ import java.util.List;
 public class Line {
 
     private int lineNumber;
-    private String className;
+    private String fileName;
     private String revisionNumber;
     private List<TestCase> testCases;
 
-    public Line(int lineNumber, String className, String revisionNumber) {
+    public Line(int lineNumber, String fileName, String revisionNumber) {
         this.lineNumber = lineNumber;
-        this.className = className;
+        this.fileName = fileName;
         this.revisionNumber = revisionNumber;
         this.testCases = new ArrayList<TestCase>();
     }
@@ -28,12 +28,12 @@ public class Line {
         this.lineNumber = lineNumber;
     }
 
-    public String getClassName() {
-        return className;
+    public String getFileName() {
+        return fileName;
     }
 
-    public void setClassName(String className) {
-        this.className = className;
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
     public String getRevisionNumber() {
