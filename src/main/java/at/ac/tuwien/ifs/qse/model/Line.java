@@ -3,6 +3,9 @@ package at.ac.tuwien.ifs.qse.model;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents a line of code.
+ */
 public class Line {
 
     private int lineNumber;

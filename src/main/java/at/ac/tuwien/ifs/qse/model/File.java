@@ -2,12 +2,15 @@ package at.ac.tuwien.ifs.qse.model;
 
 import java.util.List;
 
-public class Class {
+/**
+ * Represents a file.
+ */
+public class File {
 
     private String className;
     private List<Line> lines;
 
-    public Class(String className) {
+    public File(String className) {
         this.className = className;
     }
 

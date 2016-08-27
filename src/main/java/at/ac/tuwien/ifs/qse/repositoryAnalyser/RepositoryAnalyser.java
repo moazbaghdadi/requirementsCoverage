@@ -5,14 +5,18 @@ import org.eclipse.jgit.lib.Repository;
 
 import java.util.List;
 
+/**
+ * Responsible of analysing a repository and extracting information from it.
+ * identifies the lines implementing each issue and parses the Issue-Ids
+ * from the commit messages.
+ */
 public interface RepositoryAnalyser {
 
     /**
-     * Iterates over all files in the given Repository and Returns the
-     * Issues. The Issues should contain the lines implementing them.
+     * identifies the lines implementing each issue and parses the Issue-Ids
+     * from the commit messages.
      * @param repository the repository to analyze
-     * @return a list of issues containing the lines implementing them
      */
-    List<Issue> analyseRepository(Repository repository);
+    void analyseRepository(Repository repository);
 
 }

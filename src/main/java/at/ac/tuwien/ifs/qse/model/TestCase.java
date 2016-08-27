@@ -1,5 +1,8 @@
 package at.ac.tuwien.ifs.qse.model;
 
+/**
+ * Represents a Test Case.
+ */
 public class TestCase {
 
     private String testCaseId;

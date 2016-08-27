@@ -3,6 +3,9 @@ package at.ac.tuwien.ifs.qse.model;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents a requirement.
+ */
 public class Requirement {
 
     private String requirementId;

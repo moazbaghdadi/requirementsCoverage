@@ -1,6 +1,6 @@
 package at.ac.tuwien.ifs.qse.service;
 
-import at.ac.tuwien.ifs.qse.model.Class;
+import at.ac.tuwien.ifs.qse.model.File;
 import at.ac.tuwien.ifs.qse.model.Issue;
 import at.ac.tuwien.ifs.qse.model.Line;
 
@@ -9,27 +9,36 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Provides singleton lists to store information in.
+ */
 public class ModelAccessService {
 
-    private Map<String, Class> classes;
-    private Map<String, Issue> issues;
-    private List<Line> lines;
+    private static Map<String, File> files;
+    private static Map<String, Issue> issues;
+    private static List<Line> lines;
 
-    public ModelAccessService() {
-        this.classes = new HashMap<String, Class>();
-        this.issues = new HashMap<String, Issue>();
-        this.lines = new ArrayList<Line>();
+    private ModelAccessService() {
     }
 
-    public Map<String, Class> getClasses(){
-        return this.classes;
+    public static Map<String, File> getClasses(){
+        if (files == null) {
+            files = new HashMap<String, File>();
+        }
+        return files;
     }
 
-    public Map<String, Issue> getIssues(){
-        return this.issues;
+    public static Map<String, Issue> getIssues(){
+        if (issues == null) {
+            issues = new HashMap<String, Issue>();
+        }
+        return issues;
     }
 
-    public List<Line> getLines(){
-        return this.lines;
+    public static List<Line> getLines(){
+        if (lines == null) {
+            lines = new ArrayList<Line>();
+        }
+        return lines;
     }
 }
