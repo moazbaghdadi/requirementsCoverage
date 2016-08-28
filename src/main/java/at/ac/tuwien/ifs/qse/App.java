@@ -1,13 +1,21 @@
 package at.ac.tuwien.ifs.qse;
 
-/**
- * Hello world!
- *
- */
+import at.ac.tuwien.ifs.qse.coverageReportParser.CoverageAnalyser;
+import at.ac.tuwien.ifs.qse.coverageReportParser.JaCoCo;
+import at.ac.tuwien.ifs.qse.model.TestCase;
+import at.ac.tuwien.ifs.qse.service.ModelAccessService;
+
 public class App 
 {
     public static void main( String[] args )
     {
-        System.out.println( "Hello World!" );
+        CoverageAnalyser coverageAnalyser = new CoverageAnalyser(new JaCoCo());
+        coverageAnalyser.analyzeCoverage();
+        
+        //Print Test report
+        for (TestCase testCase :
+                ModelAccessService.getTestCases().values()) {
+            System.out.println(testCase.getTestCaseName() + " is positive: " + testCase.isPositive());
+        }
     }
 }
