@@ -4,6 +4,7 @@ import at.ac.tuwien.ifs.qse.model.TestCase;
 import at.ac.tuwien.ifs.qse.service.ModelAccessService;
 import at.ac.tuwien.ifs.qse.service.TestReportSAXHandler;
 import org.apache.maven.cli.MavenCli;
+import org.apache.maven.wagon.observers.Debug;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -32,11 +33,11 @@ public class CoverageAnalyser {
         this.testCases = ModelAccessService.getTestCases();
     }
 
-    public void analyzeCoverage() {
+    public void analyzeCoverage(String path) {
         try {
-            analyseTestReport();
+            analyseTestReport(path);
         } catch (Exception e) {
-            LOGGER.error(e.getLocalizedMessage());
+            LOGGER.error("Error while analyzing test reports: " + e.getMessage(), e);
         }
         for (TestCase testCase : testCases.values()) {
             codeCoverageTool.analyseCoverageReport(testCase);
@@ -46,20 +47,24 @@ public class CoverageAnalyser {
     /**
      * Generates the test report of the project and analyses it.
      */
-    private void analyseTestReport() throws SAXException, IOException {
+    private void analyseTestReport(String path) throws SAXException, IOException {
         MavenCli mavenCli = new MavenCli();
         String outputPath = "./target/mavenOutput.txt";
 
-        mavenCli.doMain(new String[]{"test"}, ".", new PrintStream(
-                new FileOutputStream(outputPath)), System.out);
+        /*mavenCli.doMain(new String[]{"clean test"}, path, new PrintStream(
+                new FileOutputStream(outputPath)),  new PrintStream(
+                new FileOutputStream(outputPath)));*/
+
+        mavenCli.doMain(new String[]{"test", "-fae"}, path,
+                System.out,  System.out);
 
         XMLReader parser = XMLReaderFactory.createXMLReader();
         TestReportSAXHandler handler = new TestReportSAXHandler();
         parser.setContentHandler(handler);
         List<String> reports = new ArrayList<>();
 
-        Files.walk(Paths.get("./target/surefire-reports")).forEach(filePath -> {
-            if (Files.isRegularFile(filePath) && filePath.toString().endsWith("xml")) {
+        Files.walk(Paths.get(path)).forEach(filePath -> {
+            if (Files.isRegularFile(filePath) && filePath.toString().matches(".*surefire-reports.*TEST.*xml")) {
                 reports.add(filePath.toString());
             }
         });
