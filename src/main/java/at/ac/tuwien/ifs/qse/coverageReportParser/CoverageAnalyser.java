@@ -4,7 +4,6 @@ import at.ac.tuwien.ifs.qse.model.TestCase;
 import at.ac.tuwien.ifs.qse.service.ModelAccessService;
 import at.ac.tuwien.ifs.qse.service.TestReportSAXHandler;
 import org.apache.maven.cli.MavenCli;
-import org.apache.maven.wagon.observers.Debug;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -34,12 +33,15 @@ public class CoverageAnalyser {
     }
 
     public void analyzeCoverage(String path) {
+        LOGGER.info("Starting coverage analyses...");
         try {
-            analyseTestReport(path);
+            LOGGER.info("analyzing test reports...");
+            analyseTestReports(path);
         } catch (Exception e) {
             LOGGER.error("Error while analyzing test reports: " + e.getMessage(), e);
         }
         for (TestCase testCase : testCases.values()) {
+            //LOGGER.info("analyzing Coverage reports...");
             codeCoverageTool.analyseCoverageReport(testCase);
         }
     }
@@ -47,16 +49,14 @@ public class CoverageAnalyser {
     /**
      * Generates the test report of the project and analyses it.
      */
-    private void analyseTestReport(String path) throws SAXException, IOException {
+    private void analyseTestReports(String path) throws SAXException, IOException {
         MavenCli mavenCli = new MavenCli();
         String outputPath = "./target/mavenOutput.txt";
 
-        /*mavenCli.doMain(new String[]{"clean test"}, path, new PrintStream(
+        LOGGER.info("running maven goal: mvn test -fae, output is to be found under: " + outputPath);
+        mavenCli.doMain(new String[]{"test", "-fae"}, path, new PrintStream(
                 new FileOutputStream(outputPath)),  new PrintStream(
-                new FileOutputStream(outputPath)));*/
-
-        mavenCli.doMain(new String[]{"test", "-fae"}, path,
-                System.out,  System.out);
+                new FileOutputStream(outputPath)));
 
         XMLReader parser = XMLReaderFactory.createXMLReader();
         TestReportSAXHandler handler = new TestReportSAXHandler();
@@ -69,9 +69,11 @@ public class CoverageAnalyser {
             }
         });
 
+        LOGGER.info("parsing " + reports.size() + " test reports...");
         for (String report : reports) {
             parser.parse(report);
         }
+        LOGGER.info(ModelAccessService.getTestCases().size() + " test cases were successfully parsed.");
     }
 
 }

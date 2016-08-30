@@ -4,11 +4,15 @@ import at.ac.tuwien.ifs.qse.coverageReportParser.CoverageAnalyser;
 import at.ac.tuwien.ifs.qse.coverageReportParser.JaCoCo;
 import at.ac.tuwien.ifs.qse.model.TestCase;
 import at.ac.tuwien.ifs.qse.service.ModelAccessService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
 public class App 
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(App.class);
+
     public static void main( String[] args ) throws IOException {
         String path = args[0]+ " " + args[1];
         CoverageAnalyser coverageAnalyser = new CoverageAnalyser(new JaCoCo());
@@ -19,11 +23,10 @@ public class App
         //Print Test report
         for (TestCase testCase :
                 ModelAccessService.getTestCases().values()) {
-            System.out.println(testCase.getTestCaseName() + " is positive: " + testCase.isPositive());
             count ++;
             if (testCase.isPositive())
                 positive ++;
         }
-        System.out.println("ratio of success: " + 100 * positive/((double) count) + "%");
+        LOGGER.info("positive test cases are " + 100 * positive/((double) count) + "% of all test cases");
     }
 }
