@@ -13,7 +13,7 @@ public class Requirement {
 
     public Requirement(String requirementId) {
         this.requirementId = requirementId;
-        this.issues = new ArrayList<Issue>();
+        this.issues = new ArrayList<>();
     }
 
     public String getRequirementId() {

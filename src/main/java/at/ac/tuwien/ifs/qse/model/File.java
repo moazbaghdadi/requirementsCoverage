@@ -1,5 +1,6 @@
 package at.ac.tuwien.ifs.qse.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -12,6 +13,7 @@ public class File {
 
     public File(String fileName) {
         this.fileName = fileName;
+        this.lines = new ArrayList<>();
     }
 
     public String getFileName() {

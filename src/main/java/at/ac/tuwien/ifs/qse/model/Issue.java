@@ -13,7 +13,7 @@ public class Issue {
 
     public Issue(String issueId) {
         this.issueId = issueId;
-        this.lines = new ArrayList<Line>();
+        this.lines = new ArrayList<>();
     }
 
     public String getIssueId() {

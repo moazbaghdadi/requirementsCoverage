@@ -10,7 +10,6 @@ public class TestCase {
     private boolean positive;
 
     public TestCase(String testCaseName, boolean positive) {
-        //this.testCaseId = testCaseId;
         this.testCaseName = testCaseName;
         this.positive = positive;
     }

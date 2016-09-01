@@ -13,11 +13,10 @@ public class Line {
     private String revisionNumber;
     private List<TestCase> testCases;
 
-    public Line(int lineNumber, String fileName, String revisionNumber) {
+    public Line(int lineNumber, String fileName) {
         this.lineNumber = lineNumber;
         this.fileName = fileName;
-        this.revisionNumber = revisionNumber;
-        this.testCases = new ArrayList<TestCase>();
+        this.testCases = new ArrayList<>();
     }
 
     public int getLineNumber() {
