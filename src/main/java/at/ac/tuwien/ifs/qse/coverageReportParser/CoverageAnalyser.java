@@ -1,9 +1,10 @@
 package at.ac.tuwien.ifs.qse.coverageReportParser;
 
 import at.ac.tuwien.ifs.qse.model.TestCase;
-import at.ac.tuwien.ifs.qse.service.ModelAccessService;
+import at.ac.tuwien.ifs.qse.service.PersistenceEntity;
+import at.ac.tuwien.ifs.qse.service.RemoteMavenRunner;
 import at.ac.tuwien.ifs.qse.service.TestReportSAXHandler;
-import org.apache.maven.cli.MavenCli;
+import org.apache.maven.shared.invoker.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -14,6 +15,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -25,45 +27,48 @@ import java.util.Map;
 public class CoverageAnalyser {
     private CodeCoverageTool codeCoverageTool;
     private Map<String, TestCase> testCases;
+    private PersistenceEntity persistenceEntity;
     private static final Logger LOGGER = LoggerFactory.getLogger(CoverageAnalyser.class);
 
-    public CoverageAnalyser(CodeCoverageTool codeCoverageTool) {
+    public CoverageAnalyser(PersistenceEntity persistenceEntity, CodeCoverageTool codeCoverageTool) {
         this.codeCoverageTool = codeCoverageTool;
-        this.testCases = ModelAccessService.getTestCases();
+        this.persistenceEntity = persistenceEntity;
+        this.testCases = this.persistenceEntity.getTestCases();
     }
 
-    public void analyzeCoverage(String path) {
+    public void analyzeCoverage() {
         LOGGER.info("Starting coverage analyses...");
         try {
             LOGGER.info("analyzing test reports...");
-            analyseTestReports(path);
+            analyseTestReports();
         } catch (Exception e) {
             LOGGER.error("Error while analyzing test reports: " + e.getMessage(), e);
         }
+
+        LOGGER.info("analyzing Coverage reports...");
         for (TestCase testCase : testCases.values()) {
-            //LOGGER.info("analyzing Coverage reports...");
-            codeCoverageTool.analyseCoverageReport(testCase);
+            try {
+                codeCoverageTool.analyseCoverageReport(testCase);
+            } catch (Exception e) {
+                LOGGER.error("Error while analyzing coverage report of " + testCase.getTestCaseName() + ": " + e.getMessage(), e);
+            }
         }
     }
 
     /**
      * Generates the test report of the project and analyses it.
      */
-    private void analyseTestReports(String path) throws SAXException, IOException {
-        MavenCli mavenCli = new MavenCli();
-        String outputPath = "./target/mavenOutput.txt";
+    private void analyseTestReports() throws SAXException, IOException, MavenInvocationException {
 
-        LOGGER.info("running maven goal: mvn test -fae, output is to be found under: " + outputPath);
-        mavenCli.doMain(new String[]{"test", "-fae"}, path, new PrintStream(
-                new FileOutputStream(outputPath)),  new PrintStream(
-                new FileOutputStream(outputPath)));
+        RemoteMavenRunner.runRemoteMaven(persistenceEntity.getTargetProjectPath() + "/pom.xml",
+                Arrays.asList("clean", "test", "-q", "-fae", "-DfailIfNoTests=false"));
 
         XMLReader parser = XMLReaderFactory.createXMLReader();
-        TestReportSAXHandler handler = new TestReportSAXHandler();
+        TestReportSAXHandler handler = new TestReportSAXHandler(persistenceEntity);
         parser.setContentHandler(handler);
         List<String> reports = new ArrayList<>();
 
-        Files.walk(Paths.get(path)).forEach(filePath -> {
+        Files.walk(Paths.get(persistenceEntity.getTargetProjectPath())).forEach(filePath -> {
             if (Files.isRegularFile(filePath) && filePath.toString().matches(".*surefire-reports.*TEST.*xml")) {
                 reports.add(filePath.toString());
             }
@@ -73,7 +78,7 @@ public class CoverageAnalyser {
         for (String report : reports) {
             parser.parse(report);
         }
-        LOGGER.info(ModelAccessService.getTestCases().size() + " test cases were successfully parsed.");
+        LOGGER.info(persistenceEntity.getTestCases().size() + " test cases were successfully parsed of test reports.");
     }
 
 }
