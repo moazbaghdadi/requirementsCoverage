@@ -9,5 +9,5 @@ interface CodeCoverageTool {
      * it.
      * @param testCase the test case to generate the report for.
      */
-    void analyseCoverageReport(TestCase testCase);
+    void analyseCoverageReport(TestCase testCase) throws Exception;
 }
