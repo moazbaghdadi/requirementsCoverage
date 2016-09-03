@@ -50,4 +50,23 @@ public class Line {
     public void addTestCase(TestCase testCase) {
         this.testCases.add(testCase);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Line line = (Line) o;
+
+        if (lineNumber != line.lineNumber) return false;
+        return fileName.contains(line.fileName) || line.fileName.contains(fileName);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = lineNumber;
+        result = 31 * result + fileName.hashCode();
+        return result;
+    }
 }

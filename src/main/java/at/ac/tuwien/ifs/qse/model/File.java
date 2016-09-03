@@ -31,4 +31,20 @@ public class File {
     public void addLine(Line line) {
         this.lines.add(line);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        File file = (File) o;
+
+        return fileName.equals(file.fileName);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return fileName.hashCode();
+    }
 }

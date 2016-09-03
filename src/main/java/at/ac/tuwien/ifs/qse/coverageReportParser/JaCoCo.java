@@ -37,7 +37,7 @@ public class JaCoCo implements CodeCoverageTool {
         RemoteMavenRunner.runRemoteMaven(persistenceEntity.getTargetProjectPath() + "/pom.xml",
                 Arrays.asList("jacoco:report", "-q"));
 
-        LOGGER.info("parsing coverage report");
+        LOGGER.info("parsing coverage report...");
         parseJaCoCoReport(testCase);
     }
 
