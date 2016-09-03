@@ -20,9 +20,11 @@ public class PersistenceEntity {
     private Map<String, TestCase> testCases;
     private List<Line> lines;
     private String targetProjectPath;
+    private String commitsRegEx;
 
-    public PersistenceEntity(String targetProjectPath) {
+    public PersistenceEntity(String targetProjectPath, String commitsRegEx) {
         this.targetProjectPath = targetProjectPath;
+        this.commitsRegEx = commitsRegEx;
     }
 
     public Map<String, File> getFiles(){
@@ -55,5 +57,9 @@ public class PersistenceEntity {
 
     public String getTargetProjectPath(){
         return targetProjectPath;
+    }
+
+    public String getCommitsRegEx() {
+        return commitsRegEx;
     }
 }

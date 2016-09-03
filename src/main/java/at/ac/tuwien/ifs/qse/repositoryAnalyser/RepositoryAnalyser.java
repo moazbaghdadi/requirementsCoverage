@@ -1,9 +1,8 @@
 package at.ac.tuwien.ifs.qse.repositoryAnalyser;
 
-import at.ac.tuwien.ifs.qse.model.Issue;
-import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.api.errors.GitAPIException;
 
-import java.util.List;
+import java.io.IOException;
 
 /**
  * Responsible of analysing a repository and extracting information from it.
@@ -15,8 +14,7 @@ public interface RepositoryAnalyser {
     /**
      * identifies the lines implementing each issue and parses the Issue-Ids
      * from the commit messages.
-     * @param repository the repository to analyze
      */
-    void analyseRepository(Repository repository);
+    void analyseRepository() throws GitAPIException, IOException;
 
 }
