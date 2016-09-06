@@ -61,7 +61,7 @@ public class CoverageAnalyser {
     private void analyseTestReports() throws SAXException, IOException, MavenInvocationException {
 
         RemoteMavenRunner.runRemoteMaven(persistenceEntity.getTargetProjectPath() + "/pom.xml",
-                Arrays.asList("clean", "test", "-q", "-fae", "-DfailIfNoTests=false"));
+                Arrays.asList("clean", "test", "-q", "-fn", "-fae", "-DfailIfNoTests=false"));
 
         XMLReader parser = XMLReaderFactory.createXMLReader();
         TestReportSAXHandler handler = new TestReportSAXHandler(persistenceEntity);
