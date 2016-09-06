@@ -1,8 +1,13 @@
-package at.ac.tuwien.ifs.qse.reportCreator;
+package at.ac.tuwien.ifs.qse.reportGenerator;
 
 import at.ac.tuwien.ifs.qse.model.Line;
 import at.ac.tuwien.ifs.qse.model.TestCase;
 import at.ac.tuwien.ifs.qse.service.PersistenceEntity;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Calculates different statistics about the project.
@@ -69,5 +74,20 @@ class StatisticsCalculator {
                 .filter(line -> line.getTestCases().stream()
                         .allMatch(TestCase::isPositive))
                 .count();
+    }
+
+    Set<TestCase> getTestCasesForIssue(String issueId) {
+        List<Line> relevant = persistenceEntity.getLines().stream()
+                .filter(Line::isRelevant)
+                .filter(line -> line.getIssueId() != null)
+                .filter(line -> line.getIssueId().equals(issueId))
+                .filter(line -> !line.getTestCases().isEmpty())
+                .collect(Collectors.toList());
+        Set<TestCase> testCases = new HashSet<>();
+        for (Line line :
+                relevant) {
+            testCases.addAll(line.getTestCases());
+        }
+        return testCases;
     }
 }

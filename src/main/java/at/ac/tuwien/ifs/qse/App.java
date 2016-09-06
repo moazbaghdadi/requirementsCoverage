@@ -4,7 +4,7 @@ import at.ac.tuwien.ifs.qse.coverageReportParser.CoverageAnalyser;
 import at.ac.tuwien.ifs.qse.coverageReportParser.JaCoCo;
 import at.ac.tuwien.ifs.qse.repositoryAnalyser.GitRepositoryAnalyser;
 import at.ac.tuwien.ifs.qse.service.PersistenceEntity;
-import at.ac.tuwien.ifs.qse.reportCreator.ReportPrinter;
+import at.ac.tuwien.ifs.qse.reportGenerator.ReportGenerator;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.internal.storage.file.FileRepository;
 import org.eclipse.jgit.lib.Repository;
@@ -48,8 +48,8 @@ public class App
         LOGGER.info("It took " + ((parsingEndTime - repoEndTime)/ 60000d) + " minutes to parse test and coverage reports");
 
         // printReport
-        ReportPrinter reportPrinter = new ReportPrinter(persistenceEntity);
-        reportPrinter.printOutStatistics();
+        ReportGenerator reportGenerator = new ReportGenerator(persistenceEntity);
+        reportGenerator.printOutStatistics();
 
         long statisticsEndTime = System.currentTimeMillis();
         LOGGER.info("It took " + ((statisticsEndTime - parsingEndTime)/ 1000d) + " seconds for the statistics");
