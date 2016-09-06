@@ -39,7 +39,6 @@ public class RemoteMavenRunner {
 
         String line = "";
         while ((line = reader.readLine()) != null) {
-            line = reader.readLine();
             if (line.contains("Maven home: ")) {
                 return new File(line.substring("Maven home: ".length()));
             }

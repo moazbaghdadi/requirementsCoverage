@@ -11,6 +11,8 @@ public class Line {
     private int lineNumber;
     private String fileName;
     private String revisionNumber;
+    private String issueId;
+    private boolean relevant;
     private List<TestCase> testCases;
 
     public Line(int lineNumber, String fileName) {
@@ -49,6 +51,22 @@ public class Line {
 
     public void addTestCase(TestCase testCase) {
         this.testCases.add(testCase);
+    }
+
+    public String getIssueId() {
+        return issueId;
+    }
+
+    public void setIssueId(String issueId) {
+        this.issueId = issueId;
+    }
+
+    public boolean isRelevant() {
+        return relevant;
+    }
+
+    public void setRelevant(boolean relevant) {
+        this.relevant = relevant;
     }
 
     @Override

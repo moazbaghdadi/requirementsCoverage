@@ -9,11 +9,17 @@ import java.util.List;
 public class Issue {
 
     private String issueId;
-    private List<Line> lines;
+    private List<String> revisionIds;
+    private int lines;
+    private int CoveredLines;
+    private int positiveCoveredLines;
 
     public Issue(String issueId) {
         this.issueId = issueId;
-        this.lines = new ArrayList<>();
+        this.revisionIds = new ArrayList<>();
+        lines = 0;
+        CoveredLines = 0;
+        positiveCoveredLines = 0;
     }
 
     public String getIssueId() {
@@ -24,11 +30,35 @@ public class Issue {
         this.issueId = issueId;
     }
 
-    public List<Line> getLines() {
+    public List<String> getRevisionIds() {
+        return revisionIds;
+    }
+
+    public void addRevisionId(String revisionId) {
+        this.revisionIds.add(revisionId);
+    }
+
+    public int getLines() {
         return lines;
     }
 
-    public void addLine(Line line) {
-        this.lines.add(line);
+    public void incrementLines() {
+        this.lines++;
+    }
+
+    public int getCoveredLines() {
+        return CoveredLines;
+    }
+
+    public void incrementCoveredLines() {
+        CoveredLines++;
+    }
+
+    public int getPositiveCoveredLines() {
+        return positiveCoveredLines;
+    }
+
+    public void incrementPositiveCoveredLines() {
+        this.positiveCoveredLines++;
     }
 }

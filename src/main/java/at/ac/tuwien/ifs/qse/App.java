@@ -2,6 +2,7 @@ package at.ac.tuwien.ifs.qse;
 
 import at.ac.tuwien.ifs.qse.coverageReportParser.CoverageAnalyser;
 import at.ac.tuwien.ifs.qse.coverageReportParser.JaCoCo;
+import at.ac.tuwien.ifs.qse.model.Issue;
 import at.ac.tuwien.ifs.qse.model.Line;
 import at.ac.tuwien.ifs.qse.model.TestCase;
 import at.ac.tuwien.ifs.qse.repositoryAnalyser.GitRepositoryAnalyser;
@@ -13,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Map;
 
 public class App 
 {
@@ -20,16 +22,17 @@ public class App
     private static long startTime = System.currentTimeMillis();
 
     public static void main( String[] args ) throws IOException {
-        if (args.length < 3) {
+        if (args.length < 5) {
             LOGGER.error("missing arguments. required arguments: targetProjectPath commitsRegEx");
         }
-        String targetProjectPath = args[0]+ " " + args[1];
-        String commitsRegEx = args[2];
-        PersistenceEntity persistenceEntity = new PersistenceEntity(targetProjectPath, commitsRegEx);
+        String targetRepositoryPath = args[0]+ " " + args[1];
+        String targetProjectPath = args[2]+ " " + args[3];
+        String commitsRegEx = args[4];
+        PersistenceEntity persistenceEntity = new PersistenceEntity(targetRepositoryPath, targetProjectPath, commitsRegEx);
 
         // parsing repository
         LOGGER.info("parsing repository...");
-        Repository repository = new FileRepository(targetProjectPath + "/.git");
+        Repository repository = new FileRepository(targetRepositoryPath + "/.git");
         GitRepositoryAnalyser gitRepositoryAnalyser = new GitRepositoryAnalyser(persistenceEntity, repository);
         try {
             gitRepositoryAnalyser.analyseRepository();
@@ -49,6 +52,7 @@ public class App
         // statistics
         LOGGER.info("the repository contains " + persistenceEntity.getLines().size() + " lines.");
         LOGGER.info("the repository contains " + persistenceEntity.getFiles().size() + " files.");
+        LOGGER.info("the repository contains " + persistenceEntity.getIssues().size() + " issues.");
         LOGGER.info("the repository contains " + persistenceEntity.getTestCases().size() + " test cases.");
         int count = 0;
         int positive = 0;
@@ -62,32 +66,58 @@ public class App
         }
         LOGGER.info("positive test cases are " + 100 * positive/((double) count) + "% of all test cases");
 
+        Map<String, Issue> issues = persistenceEntity.getIssues();
+        String issueId;
         boolean isCovered = true;
         boolean positiveCovered = true;
         int covered = 0;
+        int relevant = 0;
         positive = 0;
         for (Line line: persistenceEntity.getLines()) {
-            if (line.getTestCases().isEmpty()) {
-                isCovered = false;
-            }
-            for (TestCase testCase : line.getTestCases()) {
-                if (!testCase.isPositive()){
+            if(line.isRelevant()) {
+                relevant ++;
+                if ((issueId = line.getIssueId()) != null) {
+                    issues.get(issueId).incrementLines();
+                }
+                if (line.getTestCases().isEmpty()) {
+                    isCovered = false;
+                }
+                if (line.getTestCases().stream()
+                        .filter(testCase -> !testCase.isPositive())
+                        .findAny()
+                        .orElse(null) == null) {
                     positiveCovered = false;
-                    break;
                 }
-            }
-            if (isCovered) {
-                covered ++;
-                if (positiveCovered) {
-                    positive ++;
+                if (isCovered) {
+                    if ((issueId = line.getIssueId()) != null) {
+                        issues.get(issueId).incrementCoveredLines();
+                    }
+                    covered++;
+                    if (positiveCovered) {
+                        if ((issueId = line.getIssueId()) != null) {
+                            issues.get(issueId).incrementPositiveCoveredLines();
+                        }
+                        positive++;
+                    }
                 }
-            }
 
-            positiveCovered = true;
-            isCovered = true;
+                positiveCovered = true;
+                isCovered = true;
+            }
         }
+        LOGGER.info("number of relevant lines: " + relevant);
         LOGGER.info("number of covered lines: " + covered);
         LOGGER.info("number of lines covered by positive test cases: " + positive);
+
+        for (Issue issue :
+                issues.values()) {
+            LOGGER.info("Issue " + issue.getIssueId() + " has:");
+            LOGGER.info(issue.getLines() + " lines.");
+            LOGGER.info(100 * issue.getCoveredLines()/(double)issue.getLines() + "% of lines are covered.");
+            LOGGER.info(100 * issue.getPositiveCoveredLines()/(double)issue.getLines()
+                    + "% of lines are covered with positive test cases.");
+        }
+
 
         long statisticsEndTime = System.currentTimeMillis();
         LOGGER.info("It took " + ((statisticsEndTime - parsingEndTime)/ 1000d) + " seconds for the statistics");

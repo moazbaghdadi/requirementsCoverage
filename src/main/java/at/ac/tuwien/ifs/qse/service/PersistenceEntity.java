@@ -19,10 +19,12 @@ public class PersistenceEntity {
     private Map<String, Issue> issues;
     private Map<String, TestCase> testCases;
     private List<Line> lines;
+    private String targetRepositoryPath;
     private String targetProjectPath;
     private String commitsRegEx;
 
-    public PersistenceEntity(String targetProjectPath, String commitsRegEx) {
+    public PersistenceEntity(String targetRepositoryPath, String targetProjectPath, String commitsRegEx) {
+        this.targetRepositoryPath = targetRepositoryPath;
         this.targetProjectPath = targetProjectPath;
         this.commitsRegEx = commitsRegEx;
     }
@@ -53,6 +55,10 @@ public class PersistenceEntity {
             lines = new ArrayList<>();
         }
         return lines;
+    }
+
+    public String getTargetRepositoryPath() {
+        return targetRepositoryPath;
     }
 
     public String getTargetProjectPath(){

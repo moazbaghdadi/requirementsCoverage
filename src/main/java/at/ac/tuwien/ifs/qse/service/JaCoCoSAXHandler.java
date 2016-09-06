@@ -31,12 +31,15 @@ public class JaCoCoSAXHandler extends DefaultHandler {
             packageName = attributes.getValue("name");
         } else if (qualifiedName.equals("sourcefile")) {
             file = packageName.replace("/", ".") + "." + attributes.getValue("name");
-        } else if (qualifiedName.equals("line") && attributes.getValue("mi").equals("0")) {
+        } else if (qualifiedName.equals("line")) {
             Line coveredLine = new Line(Integer.valueOf(attributes.getValue("nr")), file);
             for (Line line :
                     lines) {
                 if (line.equals(coveredLine)) {
-                    line.addTestCase(testCase);
+                    if(attributes.getValue("mi").equals("0")) {
+                        line.addTestCase(testCase);
+                    }
+                    line.setRelevant(true);
                     break;
                 }
             }
