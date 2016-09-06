@@ -52,7 +52,6 @@ public class GitRepositoryAnalyser implements RepositoryAnalyser {
         blameCommand = blameCommand.setFilePath(filePath);
         BlameResult blameResult  = blameCommand.call();
 
-
         Line newLine;
 
         try {
@@ -78,7 +77,7 @@ public class GitRepositoryAnalyser implements RepositoryAnalyser {
         Issue issue;
 
         String commitsRegEx = persistenceEntity.getCommitsRegEx();
-        Pattern pattern = Pattern.compile(".*(QPID-\\d+).*", Pattern.DOTALL);
+        Pattern pattern = Pattern.compile(".*(" + commitsRegEx + ").*", Pattern.DOTALL);
         Matcher matcher;
 
         Iterable<RevCommit> log = git.log().
