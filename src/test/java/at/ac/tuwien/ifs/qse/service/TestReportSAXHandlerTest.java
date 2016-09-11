@@ -1,5 +1,6 @@
 package at.ac.tuwien.ifs.qse.service;
 
+import at.ac.tuwien.ifs.qse.persistence.PersistenceEntity;
 import org.junit.Before;
 import org.junit.Test;
 import org.xml.sax.XMLReader;
@@ -27,7 +28,7 @@ public class TestReportSAXHandlerTest {
 
         parser.parse("src/test/resources/Test-org.testReport.xml");
         assertEquals(4, persistenceEntity.getTestCases().size());
-        assertEquals(2, persistenceEntity.getTestCases().values().stream().
+        assertEquals(2, persistenceEntity.getTestCases().stream().
                 filter(at.ac.tuwien.ifs.qse.model.TestCase::isPositive)
                 .count());
     }

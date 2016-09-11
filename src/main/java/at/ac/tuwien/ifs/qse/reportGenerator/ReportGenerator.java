@@ -1,7 +1,8 @@
 package at.ac.tuwien.ifs.qse.reportGenerator;
 
+import at.ac.tuwien.ifs.qse.model.Issue;
 import at.ac.tuwien.ifs.qse.model.TestCase;
-import at.ac.tuwien.ifs.qse.service.PersistenceEntity;
+import at.ac.tuwien.ifs.qse.persistence.Persistence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,9 +12,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -21,12 +19,12 @@ import java.util.Set;
  */
 public class ReportGenerator {
     private static final Logger LOGGER = LoggerFactory.getLogger(ReportGenerator.class);
-    private PersistenceEntity persistenceEntity;
+    private Persistence persistence;
     private StatisticsCalculator statisticsCalculator;
 
-    public ReportGenerator(PersistenceEntity persistenceEntity) {
-        this.persistenceEntity = persistenceEntity;
-        this.statisticsCalculator = new StatisticsCalculator(persistenceEntity);
+    public ReportGenerator(Persistence persistence) {
+        this.persistence = persistence;
+        this.statisticsCalculator = new StatisticsCalculator(persistence);
     }
 
     public void printOutStatistics() throws IOException {
@@ -43,12 +41,12 @@ public class ReportGenerator {
 
         Files.createDirectories(Paths.get("target/requirementsCoverage/issues"));
         LOGGER.info("printing issues report...");
-        for (String issueId :
-                persistenceEntity.getIssues().keySet()) {
-            file = new File("target/requirementsCoverage/issues/" + issueId + ".html");
+        for (Issue issue :
+                persistence.getIssues()) {
+            file = new File("target/requirementsCoverage/issues/" + issue.getIssueId() + ".html");
             writer = new BufferedWriter(new FileWriter(file));
             addHeader(writer);
-            addIssuePage(writer, issueId);
+            addIssuePage(writer, issue.getIssueId());
             writer.close();
         }
         LOGGER.info("report generated under: target/requirementsCoverage");
@@ -91,21 +89,21 @@ public class ReportGenerator {
         writer.write("<article style=\"padding-left: 10%\">\n" +
                 "    <h2>Overall Statistics:</h2>\n" +
                 "    <ul>\n" +
-                "        <li>Number of files: " + persistenceEntity.getFiles().size() + "</li>\n" +
-                "        <li>Number of issues: " + persistenceEntity.getIssues().size() + "</li>\n" +
-                "        <li>Number of test cases: " + persistenceEntity.getTestCases().size() + "</li>\n" +
+                "        <li>Number of files: " + persistence.getFiles().size() + "</li>\n" +
+                "        <li>Number of issues: " + persistence.getIssues().size() + "</li>\n" +
+                "        <li>Number of test cases: " + persistence.getTestCases().size() + "</li>\n" +
                 "        <li>Number of positive test cases: " + statisticsCalculator.getNumberOfPositiveTests() + "</li>\n" +
-                "        <li>Number of lines: " + persistenceEntity.getLines().size() + "</li>\n" +
+                "        <li>Number of lines: " + persistence.getLines().size() + "</li>\n" +
                 "        <li>Number of lines relevant for coverage: " + statisticsCalculator.countRelevantLines() + "</li>\n" +
                 "        <li>Number of covered lines: " + statisticsCalculator.countCoveredLines() + "</li>\n" +
                 "        <li>Number of positively covered lines: " + statisticsCalculator.countPositivelyCoveredLines() + "</li>\n" +
                 "    </ul>\n" +
                 "    <h2>Issues:</h2>\n" +
                 "    <ul>\n");
-        List<String> issues = new ArrayList<>(persistenceEntity.getIssues().keySet());
-        Collections.sort(issues);
-        for (String issueId : issues) {
-            writer.write("        <li><a href=\"issues/" + issueId + ".html\">" + issueId + "</a></li>\n");
+        Set<Issue> issues = persistence.getIssues();
+        //Collections.sort(issues);
+        for (Issue issue : issues) {
+            writer.write("        <li><a href=\"issues/" + issue.getIssueId() + ".html\">" + issue.getIssueId() + "</a></li>\n");
         }
         writer.write("    </ul>\n</article>\n");
     }

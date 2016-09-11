@@ -5,21 +5,12 @@ package at.ac.tuwien.ifs.qse.model;
  */
 public class TestCase {
 
-    private String testCaseId;
     private String testCaseName;
     private boolean positive;
 
     public TestCase(String testCaseName, boolean positive) {
         this.testCaseName = testCaseName;
         this.positive = positive;
-    }
-
-    public String getTestCaseId() {
-        return testCaseId;
-    }
-
-    public void setTestCaseId(String testCaseId) {
-        this.testCaseId = testCaseId;
     }
 
     public String getTestCaseName() {
@@ -36,5 +27,21 @@ public class TestCase {
 
     public void setPositive(boolean positive) {
         this.positive = positive;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        TestCase testCase = (TestCase) o;
+
+        return testCaseName.equals(testCase.testCaseName);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return testCaseName.hashCode();
     }
 }

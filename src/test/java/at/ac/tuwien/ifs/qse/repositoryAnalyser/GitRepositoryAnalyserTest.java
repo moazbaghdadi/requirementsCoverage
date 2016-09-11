@@ -1,6 +1,6 @@
 package at.ac.tuwien.ifs.qse.repositoryAnalyser;
 
-import at.ac.tuwien.ifs.qse.service.PersistenceEntity;
+import at.ac.tuwien.ifs.qse.persistence.PersistenceEntity;
 import org.eclipse.jgit.internal.storage.file.FileRepository;
 import org.eclipse.jgit.lib.Repository;
 import org.junit.Before;
@@ -28,7 +28,7 @@ public class GitRepositoryAnalyserTest {
                 "QPID-\\d+");
         Repository repository = new FileRepository("D:\\Dropbox\\TU\\Bachelorarbeit\\Requirements Coverage\\project\\qpid-java\\.git");
 
-        GitRepositoryAnalyser gitRepositoryAnalyser = new GitRepositoryAnalyser(persistenceEntity, repository);
+        RepositoryAnalyser gitRepositoryAnalyser = new GitRepositoryAnalyser(persistenceEntity, repository);
         gitRepositoryAnalyser.analyseRepository();
     }
 

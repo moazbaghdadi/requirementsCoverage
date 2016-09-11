@@ -1,23 +1,23 @@
 package at.ac.tuwien.ifs.qse.coverageReportParser;
 
 import at.ac.tuwien.ifs.qse.model.TestCase;
-import at.ac.tuwien.ifs.qse.service.PersistenceEntity;
+import at.ac.tuwien.ifs.qse.persistence.Persistence;
 import at.ac.tuwien.ifs.qse.service.RemoteMavenRunner;
 import at.ac.tuwien.ifs.qse.service.TestReportSAXHandler;
-import org.apache.maven.shared.invoker.*;
+import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
-import java.io.*;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 /**
  * Generates for each test case a code coverage report and
@@ -26,14 +26,14 @@ import java.util.Map;
  */
 public class CoverageAnalyser {
     private CodeCoverageTool codeCoverageTool;
-    private Map<String, TestCase> testCases;
-    private PersistenceEntity persistenceEntity;
+    private Set<TestCase> testCases;
+    private Persistence persistence;
     private static final Logger LOGGER = LoggerFactory.getLogger(CoverageAnalyser.class);
 
-    public CoverageAnalyser(PersistenceEntity persistenceEntity, CodeCoverageTool codeCoverageTool) {
+    public CoverageAnalyser(Persistence persistence, CodeCoverageTool codeCoverageTool) {
         this.codeCoverageTool = codeCoverageTool;
-        this.persistenceEntity = persistenceEntity;
-        this.testCases = this.persistenceEntity.getTestCases();
+        this.persistence = persistence;
+        this.testCases = this.persistence.getTestCases();
     }
 
     public void analyzeCoverage() {
@@ -46,7 +46,7 @@ public class CoverageAnalyser {
         }
 
         LOGGER.info("analyzing Coverage reports...");
-        for (TestCase testCase : testCases.values()) {
+        for (TestCase testCase : testCases) {
             try {
                 codeCoverageTool.analyseCoverageReport(testCase);
             } catch (Exception e) {
@@ -60,15 +60,15 @@ public class CoverageAnalyser {
      */
     private void analyseTestReports() throws SAXException, IOException, MavenInvocationException {
 
-        RemoteMavenRunner.runRemoteMaven(persistenceEntity.getTargetProjectPath() + "/pom.xml",
+        RemoteMavenRunner.runRemoteMaven(persistence.getTargetProjectPath() + "/pom.xml",
                 Arrays.asList("clean", "test", "-q", "-fn", "-fae", "-DfailIfNoTests=false"));
 
         XMLReader parser = XMLReaderFactory.createXMLReader();
-        TestReportSAXHandler handler = new TestReportSAXHandler(persistenceEntity);
+        TestReportSAXHandler handler = new TestReportSAXHandler(persistence);
         parser.setContentHandler(handler);
         List<String> reports = new ArrayList<>();
 
-        Files.walk(Paths.get(persistenceEntity.getTargetProjectPath())).forEach(filePath -> {
+        Files.walk(Paths.get(persistence.getTargetProjectPath())).forEach(filePath -> {
             if (Files.isRegularFile(filePath) && filePath.toString().matches(".*surefire-reports.*TEST.*xml")) {
                 reports.add(filePath.toString());
             }
@@ -78,7 +78,7 @@ public class CoverageAnalyser {
         for (String report : reports) {
             parser.parse(report);
         }
-        LOGGER.info(persistenceEntity.getTestCases().size() + " test cases were successfully parsed of test reports.");
+        LOGGER.info(persistence.getTestCases().size() + " test cases were successfully parsed of test reports.");
     }
 
 }

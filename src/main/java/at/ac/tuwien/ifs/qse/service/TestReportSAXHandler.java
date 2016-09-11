@@ -1,20 +1,20 @@
 package at.ac.tuwien.ifs.qse.service;
 
 import at.ac.tuwien.ifs.qse.model.TestCase;
-import org.xml.sax.*;
+import at.ac.tuwien.ifs.qse.persistence.Persistence;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
-
-import java.util.Map;
 
 /**
  * SAX handler for test reports
  */
 public class TestReportSAXHandler extends DefaultHandler {
-    private Map<String, TestCase> testCases;
-    private String testCaseName;
+    private TestCase testCase;
+    private Persistence persistence;
 
-    public TestReportSAXHandler (PersistenceEntity persistenceEntity) {
-        this.testCases= persistenceEntity.getTestCases();
+    public TestReportSAXHandler (Persistence persistence) {
+        this.persistence = persistence;
     }
 
     public void startElement (String namespaceURI,
@@ -22,10 +22,15 @@ public class TestReportSAXHandler extends DefaultHandler {
                               String qualifiedName,
                               Attributes attributes) throws SAXException {
         if (qualifiedName.equals("testcase")){
-            testCaseName = attributes.getValue("classname");
-            testCases.put(testCaseName, new TestCase(testCaseName , true));
+            String testCaseName = attributes.getValue("classname");
+            testCase = persistence.getTestCase(testCaseName);
+            if (testCase == null) {
+                testCase = new TestCase(testCaseName, true);
+                persistence.addTestCase(testCase);
+            }
         } else if (qualifiedName.equals("failure")){
-            testCases.get(testCaseName).setPositive(false);
+            testCase.setPositive(false);
+            persistence.addTestCase(testCase);
         }
     }
 }

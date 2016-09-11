@@ -61,4 +61,20 @@ public class Issue {
     public void incrementPositiveCoveredLines() {
         this.positiveCoveredLines++;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Issue issue = (Issue) o;
+
+        return issueId.equals(issue.issueId);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return issueId.hashCode();
+    }
 }
