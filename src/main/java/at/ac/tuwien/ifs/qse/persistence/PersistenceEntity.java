@@ -16,7 +16,8 @@ public class PersistenceEntity implements Persistence {
     private Set<File> files;
     private Set<Issue> issues;
     private Set<TestCase> testCases;
-    private Set<Line> lines;
+    private Set<Line> allLines;
+    private Set<Line> relevantLines;
     private String targetRepositoryPath;
     private String targetProjectPath;
     private String issueIdsRegEx;
@@ -29,7 +30,8 @@ public class PersistenceEntity implements Persistence {
         files = new HashSet<>();
         issues = new HashSet<>();
         testCases = new HashSet<>();
-        lines = new HashSet<>();
+        allLines = new HashSet<>();
+        relevantLines = new HashSet<>();
     }
 
     @Override
@@ -97,15 +99,15 @@ public class PersistenceEntity implements Persistence {
 
     @Override
     public void addLine(Line line) {
-        if (!lines.add(line)) {
-            lines.remove(line);
-            lines.add(line);
+        if (allLines.contains(line)) {
+            allLines.remove(line);
         }
+        allLines.add(line);
     }
 
     @Override
     public Line getLine(int lineNumber, String fileName) {
-        return lines.stream()
+        return allLines.stream()
                 .filter(line -> line.getFileName().contains(fileName)
                         && line.getLineNumber() == lineNumber)
                 .findAny()
@@ -113,8 +115,30 @@ public class PersistenceEntity implements Persistence {
     }
 
     @Override
-    public Set<Line> getLines(){
-        return new HashSet<>(lines);
+    public Set<Line> getAllLines(){
+        return new HashSet<>(allLines);
+    }
+
+    @Override
+    public void addRelevantLine(Line line) {
+        if (relevantLines.contains(line)) {
+            relevantLines.remove(line);
+        }
+        relevantLines.add(line);
+    }
+
+    @Override
+    public Line getRelevantLine(int lineNumber, String fileName) {
+        return relevantLines.stream()
+                .filter(line -> line.getFileName().contains(fileName)
+                        && line.getLineNumber() == lineNumber)
+                .findAny()
+                .orElse(null);
+    }
+
+    @Override
+    public Set<Line> getRelevantLines() {
+        return relevantLines;
     }
 
     @Override
@@ -153,8 +177,8 @@ public class PersistenceEntity implements Persistence {
                 "files=" + files.size() +
                 ", issues=" + issues.size() +
                 ", testCases=" + testCases.size() +
-                ", lines=" + lines.size() +
-                ", relevantLines=" + lines.stream().filter(Line::isRelevant).count() +
+                ", allLines=" + allLines.size() +
+                ", relevantLines=" + relevantLines.size() +
                 '}';
     }
 }

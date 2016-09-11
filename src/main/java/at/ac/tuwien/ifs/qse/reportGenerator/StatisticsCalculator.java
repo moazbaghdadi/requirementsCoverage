@@ -27,21 +27,17 @@ class StatisticsCalculator {
     }
 
     long countRelevantLines() {
-        return persistence.getLines().stream()
-                .filter(Line::isRelevant)
-                .count();
+        return persistence.getRelevantLines().size();
     }
 
     long countCoveredLines() {
-        return persistence.getLines().stream()
-                .filter(Line::isRelevant)
+        return persistence.getRelevantLines().stream()
                 .filter(line -> !line.getTestCases().isEmpty())
                 .count();
     }
 
     long countPositivelyCoveredLines() {
-        return persistence.getLines().stream()
-                .filter(Line::isRelevant)
+        return persistence.getRelevantLines().stream()
                 .filter(line -> !line.getTestCases().isEmpty())
                 .filter(line -> line.getTestCases().stream()
                         .allMatch(TestCase::isPositive))
@@ -49,16 +45,14 @@ class StatisticsCalculator {
     }
 
     long countRelevantLines(String issueId) {
-        return persistence.getLines().stream()
-                .filter(Line::isRelevant)
+        return persistence.getRelevantLines().stream()
                 .filter(line -> line.getIssueId() != null)
                 .filter(line -> line.getIssueId().equals(issueId))
                 .count();
     }
 
     long countCoveredLines(String issueId) {
-        return persistence.getLines().stream()
-                .filter(Line::isRelevant)
+        return persistence.getRelevantLines().stream()
                 .filter(line -> line.getIssueId() != null)
                 .filter(line -> line.getIssueId().equals(issueId))
                 .filter(line -> !line.getTestCases().isEmpty())
@@ -66,8 +60,7 @@ class StatisticsCalculator {
     }
 
     long countPositivelyCoveredLines(String issueId) {
-        return persistence.getLines().stream()
-                .filter(Line::isRelevant)
+        return persistence.getRelevantLines().stream()
                 .filter(line -> line.getIssueId() != null)
                 .filter(line -> line.getIssueId().equals(issueId))
                 .filter(line -> !line.getTestCases().isEmpty())
@@ -77,8 +70,7 @@ class StatisticsCalculator {
     }
 
     Set<TestCase> getTestCasesForIssue(String issueId) {
-        List<Line> relevant = persistence.getLines().stream()
-                .filter(Line::isRelevant)
+        List<Line> relevant = persistence.getRelevantLines().stream()
                 .filter(line -> line.getIssueId() != null)
                 .filter(line -> line.getIssueId().equals(issueId))
                 .filter(line -> !line.getTestCases().isEmpty())
@@ -92,7 +84,7 @@ class StatisticsCalculator {
     }
 
     long countLines(String issueId) {
-        return persistence.getLines().stream()
+        return persistence.getAllLines().stream()
                 .filter(line -> line.getIssueId() != null)
                 .filter(line -> line.getIssueId().equals(issueId))
                 .count();

@@ -67,59 +67,58 @@ public class StatisticsCalculatorTest{
 
 
         Line line1 = new Line(1, "file1");
-        line1.setRelevant(true);
         line1.setIssueId("issue 1");
         line1.addTestCase(testCase1);
+        persistenceEntity.addRelevantLine(line1);
         persistenceEntity.addLine(line1);
 
         Line line2 = new Line(2, "file1");
-        line2.setRelevant(true);
         line2.setIssueId("issue 1");
+        persistenceEntity.addRelevantLine(line2);
         persistenceEntity.addLine(line2);
 
         Line line3 = new Line(3, "file1");
-        line3.setRelevant(true);
         line3.setIssueId("issue 1");
         line3.addTestCase(testCase4);
+        persistenceEntity.addRelevantLine(line3);
         persistenceEntity.addLine(line3);
 
         Line line4 = new Line(1, "file2");
-        line4.setRelevant(true);
         line4.setIssueId("issue 2");
         line4.addTestCase(testCase1);
+        persistenceEntity.addRelevantLine(line4);
         persistenceEntity.addLine(line4);
 
         Line line5 = new Line(1, "file3");
-        line5.setRelevant(true);
         line5.setIssueId("issue 2");
         line5.addTestCase(testCase4);
+        persistenceEntity.addRelevantLine(line5);
         persistenceEntity.addLine(line5);
 
         Line line6 = new Line(1, "file4");
-        line6.setRelevant(true);
         line6.setIssueId("issue 2");
+        persistenceEntity.addRelevantLine(line6);
         persistenceEntity.addLine(line6);
 
         Line line7 = new Line(1, "file5");
-        line7.setRelevant(true);
         line7.setIssueId("issue 3");
         line7.addTestCase(testCase1);
+        persistenceEntity.addRelevantLine(line7);
         persistenceEntity.addLine(line7);
 
         Line line8 = new Line(2, "file5");
-        line8.setRelevant(true);
         line8.setIssueId("issue 4");
         line8.addTestCase(testCase4);
+        persistenceEntity.addRelevantLine(line8);
         persistenceEntity.addLine(line8);
 
         Line line9 = new Line(1, "file6");
-        line9.setRelevant(true);
         line9.setIssueId("issue 5");
         line9.addTestCase(testCase4);
+        persistenceEntity.addRelevantLine(line9);
         persistenceEntity.addLine(line9);
 
         Line line10 = new Line(2, "file6");
-        line10.setRelevant(false);
         line10.setIssueId("issue 6");
         line10.addTestCase(testCase4);
         persistenceEntity.addLine(line10);

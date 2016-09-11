@@ -32,10 +32,11 @@ public class JaCoCoRelevanceSAXHandler extends DefaultHandler {
                 break;
             case "line":
                 Line line = persistence.getLine(Integer.valueOf(attributes.getValue("nr")), file);
-                if (line != null) {
-                    line.setRelevant(true);
+                if (line == null) {
+                    line = new Line(Integer.valueOf(attributes.getValue("nr")), file);
                     persistence.addLine(line);
                 }
+                persistence.addRelevantLine(line);
                 break;
         }
     }

@@ -48,8 +48,8 @@ public class JaCoCoSAXHandlerTest {
 
         parser.parse("src/test/resources/jacoco.xml");
 
-        assertEquals(10, persistenceEntity.getLines().size());
-        assertEquals(2, persistenceEntity.getLines().stream()
+        assertEquals(10, persistenceEntity.getAllLines().size());
+        assertEquals(2, persistenceEntity.getAllLines().stream()
         .filter(line -> !line.getTestCases().isEmpty()).count());
     }
 }

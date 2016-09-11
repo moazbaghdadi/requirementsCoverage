@@ -110,7 +110,33 @@ public interface Persistence {
      *
      * @return a set containing all lines
      */
-    Set<Line> getLines();
+    Set<Line> getAllLines();
+
+    /**
+     * Persists the given relevant line. If the line already exists,
+     * it will be replaced with the new line.
+     *
+     * @param line the line to be added
+     */
+    void addRelevantLine(Line line);
+
+    /**
+     * Returns the relevant line with the given line number and file name. If the
+     * line doesn't exist, returns null.
+     *
+     * @param lineNumber the line number of the line to be returned.
+     * @param fileName the file name of the file containing the line.
+     * @return the relevant line with the given line number and file name. If the
+     * line doesn't exist, returns null
+     */
+    Line getRelevantLine(int lineNumber, String fileName);
+
+    /**
+     * Returns a set containing all relevant lines.
+     *
+     * @return a set containing all relevant lines.
+     */
+    Set<Line> getRelevantLines();
 
     /**
      * sets the path to the target project's repository.

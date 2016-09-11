@@ -12,6 +12,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -97,15 +100,16 @@ public class ReportGenerator {
                 "        <li>Number of issues: " + persistence.getIssues().size() + "</li>\n" +
                 "        <li>Number of test cases: " + persistence.getTestCases().size() + "</li>\n" +
                 "        <li>Number of positive test cases: " + statisticsCalculator.getNumberOfPositiveTests() + "</li>\n" +
-                "        <li>Number of lines: " + persistence.getLines().size() + "</li>\n" +
+                "        <li>Number of lines: " + persistence.getAllLines().size() + "</li>\n" +
                 "        <li>Number of lines relevant for coverage: " + statisticsCalculator.countRelevantLines() + "</li>\n" +
                 "        <li>Number of covered lines: " + statisticsCalculator.countCoveredLines() + "</li>\n" +
                 "        <li>Number of positively covered lines: " + statisticsCalculator.countPositivelyCoveredLines() + "</li>\n" +
                 "    </ul>\n" +
                 "    <h2>Issues:</h2>\n" +
                 "    <ul>\n");
-        Set<Issue> issues = persistence.getIssues();
-        //Collections.sort(issues);
+
+        List<Issue> issues = new ArrayList<>(persistence.getIssues());
+        Collections.sort(issues);
         for (Issue issue : issues) {
             writer.write("        <li><a href=\"issues/" + issue.getIssueId() + ".html\">" + issue.getIssueId() + "</a></li>\n");
         }

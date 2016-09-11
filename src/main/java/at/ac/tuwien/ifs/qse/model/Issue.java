@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * Represents an issue.
  */
-public class Issue {
+public class Issue implements Comparable<Issue> {
 
     private String issueId;
     private List<String> revisionIds;
@@ -76,5 +76,10 @@ public class Issue {
     @Override
     public int hashCode() {
         return issueId.hashCode();
+    }
+
+    @Override
+    public int compareTo(Issue issue) {
+        return issueId.compareTo(issue.getIssueId());
     }
 }

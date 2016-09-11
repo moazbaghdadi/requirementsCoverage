@@ -35,10 +35,10 @@ public class JaCoCoSAXHandler extends DefaultHandler {
                 break;
             case "line":
                 if (attributes.getValue("mi").equals("0")) {
-                    Line line = persistence.getLine(Integer.valueOf(attributes.getValue("nr")), file);
+                    Line line = persistence.getRelevantLine(Integer.valueOf(attributes.getValue("nr")), file);
                     if (line != null) {
                         line.addTestCase(testCase);
-                        persistence.addLine(line);
+                        persistence.addRelevantLine(line);
                     }
                 }
                 break;

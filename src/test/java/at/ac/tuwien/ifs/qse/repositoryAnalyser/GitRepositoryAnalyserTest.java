@@ -50,7 +50,7 @@ public class GitRepositoryAnalyserTest {
                 }
             }
         }
-        assertEquals(lines, persistenceEntity.getLines().size());
+        assertEquals(lines, persistenceEntity.getAllLines().size());
     }
 
     @Test
