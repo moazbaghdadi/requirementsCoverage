@@ -2,6 +2,7 @@ package at.ac.tuwien.ifs.qse.service;
 
 import at.ac.tuwien.ifs.qse.model.Line;
 import at.ac.tuwien.ifs.qse.persistence.PersistenceEntity;
+import at.ac.tuwien.ifs.qse.xmlParser.JaCoCoSAXHandler;
 import org.junit.Before;
 import org.junit.Test;
 import org.xml.sax.XMLReader;

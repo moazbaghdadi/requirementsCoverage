@@ -3,13 +3,12 @@ package at.ac.tuwien.ifs.qse.coverageReportParser;
 import at.ac.tuwien.ifs.qse.model.TestCase;
 import at.ac.tuwien.ifs.qse.persistence.Persistence;
 import at.ac.tuwien.ifs.qse.service.RemoteMavenRunner;
-import at.ac.tuwien.ifs.qse.service.TestReportSAXHandler;
+import at.ac.tuwien.ifs.qse.xmlParser.ParserRunner;
+import at.ac.tuwien.ifs.qse.xmlParser.TestReportSAXHandler;
 import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.XMLReaderFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -73,22 +72,16 @@ public class CoverageAnalyser {
         RemoteMavenRunner.runRemoteMaven(persistence.getTargetProjectPath() + "/pom.xml",
                 Arrays.asList("clean", "test", "-q", "-fn", "-fae", "-DfailIfNoTests=false"));
 
-        XMLReader parser = XMLReaderFactory.createXMLReader();
+        ParserRunner parserRunner = new ParserRunner();
         TestReportSAXHandler handler = new TestReportSAXHandler(persistence);
-        parser.setContentHandler(handler);
         List<String> reports = new ArrayList<>();
-
         Files.walk(Paths.get(persistence.getTargetProjectPath())).forEach(filePath -> {
             if (Files.isRegularFile(filePath) && filePath.toString().matches(".*surefire-reports.*TEST.*xml")) {
                 reports.add(filePath.toString());
             }
         });
 
-        LOGGER.info("parsing " + reports.size() + " test reports...");
-        for (String report : reports) {
-            parser.parse(report);
-        }
-        LOGGER.info(persistence.getTestCases().size() + " test cases were successfully parsed of test reports.");
+        parserRunner.runXMLParser(handler, reports);
     }
 
 }

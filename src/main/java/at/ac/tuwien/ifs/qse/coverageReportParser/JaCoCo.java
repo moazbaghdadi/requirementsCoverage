@@ -2,15 +2,14 @@ package at.ac.tuwien.ifs.qse.coverageReportParser;
 
 import at.ac.tuwien.ifs.qse.model.TestCase;
 import at.ac.tuwien.ifs.qse.persistence.Persistence;
-import at.ac.tuwien.ifs.qse.service.JaCoCoRelevanceSAXHandler;
-import at.ac.tuwien.ifs.qse.service.JaCoCoSAXHandler;
 import at.ac.tuwien.ifs.qse.service.RemoteMavenRunner;
+import at.ac.tuwien.ifs.qse.xmlParser.JaCoCoRelevanceSAXHandler;
+import at.ac.tuwien.ifs.qse.xmlParser.JaCoCoSAXHandler;
+import at.ac.tuwien.ifs.qse.xmlParser.ParserRunner;
 import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.XMLReaderFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -36,6 +35,8 @@ public class JaCoCo implements CodeCoverageTool {
         RemoteMavenRunner.runRemoteMaven(persistence.getTargetProjectPath() + "/pom.xml",
                 Arrays.asList("jacoco:report", "-q"));
 
+        ParserRunner parserRunner = new ParserRunner();
+        JaCoCoRelevanceSAXHandler handler = new JaCoCoRelevanceSAXHandler(persistence);
         List<String> reports = new ArrayList<>();
         Files.walk(Paths.get(persistence.getTargetProjectPath())).forEach(filePath -> {
             if (Files.isRegularFile(filePath) && filePath.toString().matches(".*target.*site.*jacoco.*jacoco.xml")) {
@@ -43,17 +44,8 @@ public class JaCoCo implements CodeCoverageTool {
             }
         });
 
-        XMLReader parser = XMLReaderFactory.createXMLReader();
-        JaCoCoRelevanceSAXHandler handler = new JaCoCoRelevanceSAXHandler(persistence);
-        parser.setContentHandler(handler);
-        parser.setFeature("http://xml.org/sax/features/validation", false);
-        parser.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
-        parser.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-
         LOGGER.info("parsing coverage report...");
-        for (String report : reports) {
-            parser.parse(report);
-        }
+        parserRunner.runXMLParser(handler, reports);
     }
 
     public void analyseCoverageReport(TestCase testCase) throws IOException, SAXException, MavenInvocationException {
@@ -67,12 +59,8 @@ public class JaCoCo implements CodeCoverageTool {
         RemoteMavenRunner.runRemoteMaven(persistence.getTargetProjectPath() + "/pom.xml",
                 Arrays.asList("jacoco:report", "-q"));
 
-        LOGGER.info("parsing coverage report...");
-        parseJaCoCoReport(testCase);
-    }
-
-    private void parseJaCoCoReport(TestCase testCase) throws SAXException, IOException {
-
+        ParserRunner parserRunner = new ParserRunner();
+        JaCoCoSAXHandler handler = new JaCoCoSAXHandler(persistence, testCase);
         List<String> reports = new ArrayList<>();
         Files.walk(Paths.get(persistence.getTargetProjectPath())).forEach(filePath -> {
             if (Files.isRegularFile(filePath) && filePath.toString().matches(".*target.*site.*jacoco.*jacoco.xml")) {
@@ -80,15 +68,7 @@ public class JaCoCo implements CodeCoverageTool {
             }
         });
 
-        XMLReader parser = XMLReaderFactory.createXMLReader();
-        JaCoCoSAXHandler handler = new JaCoCoSAXHandler(persistence, testCase);
-        parser.setContentHandler(handler);
-        parser.setFeature("http://xml.org/sax/features/validation", false);
-        parser.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
-        parser.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-
-        for (String report : reports) {
-            parser.parse(report);
-        }
+        LOGGER.info("parsing coverage report...");
+        parserRunner.runXMLParser(handler, reports);
     }
 }

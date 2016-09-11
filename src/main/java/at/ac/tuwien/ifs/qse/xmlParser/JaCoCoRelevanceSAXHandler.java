@@ -1,4 +1,4 @@
-package at.ac.tuwien.ifs.qse.service;
+package at.ac.tuwien.ifs.qse.xmlParser;
 
 import at.ac.tuwien.ifs.qse.model.Line;
 import at.ac.tuwien.ifs.qse.persistence.Persistence;
