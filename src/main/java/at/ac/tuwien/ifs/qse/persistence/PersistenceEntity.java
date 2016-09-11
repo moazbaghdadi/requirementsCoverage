@@ -97,10 +97,10 @@ public class PersistenceEntity implements Persistence {
 
     @Override
     public void addLine(Line line) {
-        if (lines.contains(line)) {
+        if (!lines.add(line)) {
             lines.remove(line);
+            lines.add(line);
         }
-        lines.add(line);
     }
 
     @Override

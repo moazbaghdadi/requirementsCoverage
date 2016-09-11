@@ -36,7 +36,6 @@ public class GitRepositoryAnalyser implements RepositoryAnalyser {
                 projectFiles.add(filePath.toString().substring(persistence.getTargetRepositoryPath().length()+1).replace("\\", "/"));
             }
         });
-
         for (String filePath :
                 projectFiles) {
             getLinesInfo(filePath);
@@ -44,7 +43,6 @@ public class GitRepositoryAnalyser implements RepositoryAnalyser {
     }
 
     private void getLinesInfo(String filePath) throws GitAPIException, IOException {
-        System.out.println(filePath);
         BlameCommand blameCommand = git.blame();
         blameCommand = blameCommand.setStartCommit(git.getRepository().resolve("HEAD"));
         blameCommand = blameCommand.setFilePath(filePath);
@@ -63,11 +61,7 @@ public class GitRepositoryAnalyser implements RepositoryAnalyser {
 
             for (int i = 0; i < rawText.size(); i++) {
                 lineNumber = blameResult.getSourceLine(i);
-                line = persistence.getLine(lineNumber, file.getFileName());
-
-                if (line == null) {
-                    line = new Line(blameResult.getSourceLine(i), file.getFileName());
-                }
+                line = new Line(lineNumber, file.getFileName());
 
                 line.setRevisionNumber(blameResult.getSourceCommit(i).getName());
                 line.setIssueId(getIssueId(blameResult.getSourceCommit(i).getName()));
