@@ -106,7 +106,7 @@ public class PersistenceEntity implements Persistence {
     @Override
     public Line getLine(int lineNumber, String fileName) {
         return lines.stream()
-                .filter(line -> line.getFileName().equals(fileName)
+                .filter(line -> line.getFileName().contains(fileName)
                         && line.getLineNumber() == lineNumber)
                 .findAny()
                 .orElse(null);
