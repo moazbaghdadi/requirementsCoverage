@@ -35,8 +35,8 @@ public class ReportGenerator {
         Files.createDirectories(Paths.get("target/requirementsCoverage/"));
         File file = new File("target/requirementsCoverage/index.html");
         BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-        printHeader(writer);
-        printProjectInfo(writer);
+        addHeader(writer);
+        addProjectInfo(writer);
 
         writer.write("</body>\n</html>");
         writer.close();
@@ -47,14 +47,14 @@ public class ReportGenerator {
                 persistenceEntity.getIssues().keySet()) {
             file = new File("target/requirementsCoverage/issues/" + issueId + ".html");
             writer = new BufferedWriter(new FileWriter(file));
-            printHeader(writer);
-            printIssuePage(writer, issueId);
+            addHeader(writer);
+            addIssuePage(writer, issueId);
             writer.close();
         }
         LOGGER.info("report generated under: target/requirementsCoverage");
     }
 
-    private void printIssuePage(BufferedWriter writer, String issueId) throws IOException {
+    private void addIssuePage(BufferedWriter writer, String issueId) throws IOException {
         long covered = statisticsCalculator.countCoveredLines(issueId);
         long relevant = statisticsCalculator.countRelevantLines(issueId);
         long positive = statisticsCalculator.countPositivelyCoveredLines(issueId);
@@ -86,7 +86,7 @@ public class ReportGenerator {
         writer.write("    </ul>\n</article>\n");
     }
 
-    private void printProjectInfo(BufferedWriter writer) throws IOException {
+    private void addProjectInfo(BufferedWriter writer) throws IOException {
         writer.write("<h1 style=\"float: none;\" align=\"center\">Project Name</h1>");
         writer.write("<article style=\"padding-left: 10%\">\n" +
                 "    <h2>Overall Statistics:</h2>\n" +
@@ -110,7 +110,7 @@ public class ReportGenerator {
         writer.write("    </ul>\n</article>\n");
     }
 
-    private void printHeader(BufferedWriter writer) throws IOException {
+    private void addHeader(BufferedWriter writer) throws IOException {
         writer.write("<!DOCTYPE html>\n" +
                 "<html lang=\"en\">\n" +
                 "<head>\n" +
