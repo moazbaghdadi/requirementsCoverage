@@ -2,6 +2,7 @@ package at.ac.tuwien.ifs.qse.coverageReportParser;
 
 import at.ac.tuwien.ifs.qse.model.TestCase;
 import at.ac.tuwien.ifs.qse.persistence.Persistence;
+import at.ac.tuwien.ifs.qse.service.JaCoCoRelevanceSAXHandler;
 import at.ac.tuwien.ifs.qse.service.JaCoCoSAXHandler;
 import at.ac.tuwien.ifs.qse.service.RemoteMavenRunner;
 import org.apache.maven.shared.invoker.MavenInvocationException;
@@ -24,6 +25,35 @@ public class JaCoCo implements CodeCoverageTool {
 
     public JaCoCo (Persistence persistence){
         this.persistence = persistence;
+    }
+
+    public void analyseRelevantLines() throws IOException, SAXException, MavenInvocationException {
+        LOGGER.info("running maven goal: mvn clean test -q -DfailIfNoTests=false");
+        RemoteMavenRunner.runRemoteMaven(persistence.getTargetProjectPath() + "/pom.xml",
+                Arrays.asList("clean", "test", "-q", "-DfailIfNoTests=false"));
+
+        LOGGER.info("running maven goal: jacoco:report -q");
+        RemoteMavenRunner.runRemoteMaven(persistence.getTargetProjectPath() + "/pom.xml",
+                Arrays.asList("jacoco:report", "-q"));
+
+        List<String> reports = new ArrayList<>();
+        Files.walk(Paths.get(persistence.getTargetProjectPath())).forEach(filePath -> {
+            if (Files.isRegularFile(filePath) && filePath.toString().matches(".*target.*site.*jacoco.*jacoco.xml")) {
+                reports.add(filePath.toString());
+            }
+        });
+
+        XMLReader parser = XMLReaderFactory.createXMLReader();
+        JaCoCoRelevanceSAXHandler handler = new JaCoCoRelevanceSAXHandler(persistence);
+        parser.setContentHandler(handler);
+        parser.setFeature("http://xml.org/sax/features/validation", false);
+        parser.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
+        parser.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+
+        LOGGER.info("parsing coverage report...");
+        for (String report : reports) {
+            parser.parse(report);
+        }
     }
 
     public void analyseCoverageReport(TestCase testCase) throws IOException, SAXException, MavenInvocationException {

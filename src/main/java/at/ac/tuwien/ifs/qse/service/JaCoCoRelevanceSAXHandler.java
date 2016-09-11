@@ -1,7 +1,6 @@
 package at.ac.tuwien.ifs.qse.service;
 
 import at.ac.tuwien.ifs.qse.model.Line;
-import at.ac.tuwien.ifs.qse.model.TestCase;
 import at.ac.tuwien.ifs.qse.persistence.Persistence;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -10,16 +9,14 @@ import org.xml.sax.helpers.DefaultHandler;
 /**
  * SAX handler for JacCoCo reports
  */
-public class JaCoCoSAXHandler extends DefaultHandler {
+public class JaCoCoRelevanceSAXHandler extends DefaultHandler {
 
     private String packageName;
     private String file;
-    private TestCase testCase;
     private Persistence persistence;
 
-    public JaCoCoSAXHandler (Persistence persistence, TestCase testCase) {
+    public JaCoCoRelevanceSAXHandler(Persistence persistence) {
         this.persistence = persistence;
-        this.testCase = testCase;
     }
 
     public void startElement (String namespaceURI,
@@ -34,12 +31,10 @@ public class JaCoCoSAXHandler extends DefaultHandler {
                 file = packageName.replace("/", ".") + "." + attributes.getValue("name");
                 break;
             case "line":
-                if (attributes.getValue("mi").equals("0")) {
-                    Line line = persistence.getLine(Integer.valueOf(attributes.getValue("nr")), file);
-                    if (line != null) {
-                        line.addTestCase(testCase);
-                        persistence.addLine(line);
-                    }
+                Line line = persistence.getLine(Integer.valueOf(attributes.getValue("nr")), file);
+                if (line != null) {
+                    line.setRelevant(true);
+                    persistence.addLine(line);
                 }
                 break;
         }

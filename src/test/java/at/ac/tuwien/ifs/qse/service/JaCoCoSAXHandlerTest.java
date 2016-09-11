@@ -47,10 +47,8 @@ public class JaCoCoSAXHandlerTest {
 
         parser.parse("src/test/resources/jacoco.xml");
 
-        assertEquals(12, persistenceEntity.getLines().size());
-        assertEquals(6, persistenceEntity.getLines().stream()
-        .filter(Line::isRelevant).count());
-        assertEquals(3, persistenceEntity.getLines().stream()
+        assertEquals(10, persistenceEntity.getLines().size());
+        assertEquals(2, persistenceEntity.getLines().stream()
         .filter(line -> !line.getTestCases().isEmpty()).count());
     }
 }

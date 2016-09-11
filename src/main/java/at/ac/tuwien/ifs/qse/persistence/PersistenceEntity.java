@@ -146,4 +146,15 @@ public class PersistenceEntity implements Persistence {
     public String getIssueIdsRegEx() {
         return issueIdsRegEx;
     }
+
+    @Override
+    public String toString() {
+        return "PersistenceEntity{" +
+                "files=" + files.size() +
+                ", issues=" + issues.size() +
+                ", testCases=" + testCases.size() +
+                ", lines=" + lines.size() +
+                ", relevantLines=" + lines.stream().filter(Line::isRelevant).count() +
+                '}';
+    }
 }

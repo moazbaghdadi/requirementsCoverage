@@ -17,7 +17,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Generates for each test case a code coverage report and
@@ -26,14 +25,12 @@ import java.util.Set;
  */
 public class CoverageAnalyser {
     private CodeCoverageTool codeCoverageTool;
-    private Set<TestCase> testCases;
     private Persistence persistence;
     private static final Logger LOGGER = LoggerFactory.getLogger(CoverageAnalyser.class);
 
     public CoverageAnalyser(Persistence persistence, CodeCoverageTool codeCoverageTool) {
         this.codeCoverageTool = codeCoverageTool;
         this.persistence = persistence;
-        this.testCases = this.persistence.getTestCases();
     }
 
     public void analyzeCoverage() {
@@ -44,15 +41,28 @@ public class CoverageAnalyser {
         } catch (Exception e) {
             LOGGER.error("Error while analyzing test reports: " + e.getMessage(), e);
         }
+        LOGGER.info(persistence.toString());
 
-        LOGGER.info("analyzing Coverage reports...");
-        for (TestCase testCase : testCases) {
+        LOGGER.info("identifying relevant lines...");
+        try {
+            codeCoverageTool.analyseRelevantLines();
+        } catch (Exception e) {
+            LOGGER.error("Error while analyzing relevant lines: " + e.getMessage(), e);
+        }
+        LOGGER.info(persistence.toString());
+
+        LOGGER.info("analyzing coverage reports...");
+        int numberOfTests = persistence.getTestCases().size();
+        int current = 1;
+        for (TestCase testCase : persistence.getTestCases()) {
             try {
+                LOGGER.info("analysing report for test case " + current++ + "/" + numberOfTests);
                 codeCoverageTool.analyseCoverageReport(testCase);
             } catch (Exception e) {
                 LOGGER.error("Error while analyzing coverage report of " + testCase.getTestCaseName() + ": " + e.getMessage(), e);
             }
         }
+        LOGGER.info(persistence.toString());
     }
 
     /**
