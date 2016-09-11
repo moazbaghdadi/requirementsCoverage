@@ -90,4 +90,11 @@ class StatisticsCalculator {
         }
         return testCases;
     }
+
+    long countLines(String issueId) {
+        return persistence.getLines().stream()
+                .filter(line -> line.getIssueId() != null)
+                .filter(line -> line.getIssueId().equals(issueId))
+                .count();
+    }
 }

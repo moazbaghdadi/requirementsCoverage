@@ -53,10 +53,12 @@ public class ReportGenerator {
     }
 
     private void addIssuePage(BufferedWriter writer, String issueId) throws IOException {
+        long allLines = statisticsCalculator.countLines(issueId);
         long covered = statisticsCalculator.countCoveredLines(issueId);
         long relevant = statisticsCalculator.countRelevantLines(issueId);
         long positive = statisticsCalculator.countPositivelyCoveredLines(issueId);
         long uncovered = relevant - covered;
+        double relevantLinesPercentage = 100 * relevant / (allLines!=0?allLines:1);
         double totalCoverage = 100 * covered / (relevant!=0?relevant:1);
         double positiveCoverage = 100 * positive / (covered!=0?covered:1);
         double negativeCoverage = 100 * (covered-positive) / (covered!=0?covered:1);
@@ -66,6 +68,8 @@ public class ReportGenerator {
         writer.write("<article style=\"padding-left: 10%\">\n" +
                 "    <h2>Coverage Statistics:</h2>\n" +
                 "    <ul>\n" +
+                "        <li>Relevant lines: " + relevantLinesPercentage +
+                "% (" + relevant + " of " + allLines + " lines)</li>\n" +
                 "        <li>Total coverage: " + totalCoverage +
                     "% (" + covered + " of " + relevant + " lines)</li>\n" +
                 "        <li>Coverage by positive test cases: " + positiveCoverage +
