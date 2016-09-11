@@ -1,39 +1,22 @@
 package at.ac.tuwien.ifs.qse;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import at.ac.tuwien.ifs.qse.reportGenerator.StatisticsCalculatorTest;
+import at.ac.tuwien.ifs.qse.repositoryAnalyser.GitRepositoryAnalyserTest;
+import at.ac.tuwien.ifs.qse.service.JaCoCoSAXHandlerTest;
+import at.ac.tuwien.ifs.qse.service.TestReportSAXHandlerTest;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 
 /**
  * Unit test for simple App.
  */
-public class AppTest 
-    extends TestCase
-{
-    /**
-     * Create the test case
-     *
-     * @param testName name of the test case
-     */
-    public AppTest( String testName )
-    {
-        super( testName );
-    }
-
-    /**
-     * @return the suite of tests being tested
-     */
-    public static Test suite()
-    {
-        return new TestSuite( AppTest.class );
-    }
-
-    /**
-     * Rigourous Test :-)
-     */
-    public void testApp()
-    {
-        assertTrue( true );
-    }
+@RunWith(Suite.class)
+@Suite.SuiteClasses({
+        StatisticsCalculatorTest.class,
+        GitRepositoryAnalyserTest.class,
+        JaCoCoSAXHandlerTest.class,
+        TestReportSAXHandlerTest.class
+})
+public class AppTest {
 
 }

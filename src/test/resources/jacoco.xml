@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<report name="TestJacocoReport">
+    <sessioninfo id="123" dump="156" start="f45"/>
+    <package name="package">
+        <sourcefile name="source1.java">
+            <line cb="0" mb="0" ci="0" mi="0" nr="1"/>
+            <line cb="0" mb="0" ci="0" mi="13" nr="2"/>
+            <line cb="0" mb="0" ci="0" mi="0" nr="5"/>
+        </sourcefile>
+        <sourcefile name="source2.java">
+            <line cb="0" mb="0" ci="0" mi="2" nr="1"/>
+            <line cb="0" mb="0" ci="0" mi="0" nr="2"/>
+            <line cb="0" mb="0" ci="0" mi="1" nr="4"/>
+    </sourcefile>
+    </package>
+</report>
