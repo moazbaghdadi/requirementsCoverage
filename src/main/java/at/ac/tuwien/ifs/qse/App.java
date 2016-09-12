@@ -22,16 +22,16 @@ import java.util.Arrays;
 public class App 
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(App.class);
-    private static long startTime = System.currentTimeMillis();
+    private static final long startTime = System.currentTimeMillis();
 
     public static void main( String[] args ) throws IOException {
-        if (args.length < 5) {
-            LOGGER.error("missing arguments. required arguments: targetRepositoryPath targetProjectPath issueIdRegEx");
+        if (args.length != 3) {
+            LOGGER.error("wrong number of arguments. required arguments: targetRepositoryPath targetProjectPath issueIdRegEx");
             return;
         }
-        String targetRepositoryPath = args[0]+ " " + args[1];
-        String targetProjectPath = args[2]+ " " + args[3];
-        String issueIdRegEx = args[4];
+        String targetRepositoryPath = args[0];
+        String targetProjectPath = args[1];
+        String issueIdRegEx = args[2];
         Persistence persistence = new PersistenceEntity(targetRepositoryPath, targetProjectPath, issueIdRegEx);
 
         // clean project
@@ -57,23 +57,23 @@ public class App
         }
         LOGGER.info(persistence.toString());
         long repoEndTime = System.currentTimeMillis();
-        LOGGER.info("It took " + ((repoEndTime - startTime)/ 1000d) + " seconds to parse repository");
+        LOGGER.info("repository parsed, elapsed time: " + ((repoEndTime - startTime)/ 1000d) + " sec.");
 
         // parsing test and coverage reports
         CoverageAnalyser coverageAnalyser = new CoverageAnalyser(persistence, new JaCoCo(persistence));
         coverageAnalyser.analyzeCoverage();
 
         long parsingEndTime = System.currentTimeMillis();
-        LOGGER.info("It took " + ((parsingEndTime - repoEndTime)/ 60000d) + " minutes to parse test and coverage reports");
+        LOGGER.info("test and coverage reports parsed, elapsed time " + ((parsingEndTime - repoEndTime)/ 60000d) + " min.");
 
         // printReport
         ReportGenerator reportGenerator = new ReportGenerator(persistence);
         reportGenerator.printOutStatistics();
 
         long statisticsEndTime = System.currentTimeMillis();
-        LOGGER.info("It took " + ((statisticsEndTime - parsingEndTime)/ 1000d) + " seconds for the statistics");
+        LOGGER.info("requirements coverage report generated, elapsed time: " + ((statisticsEndTime - parsingEndTime)/ 1000d) + " sec.");
 
-        LOGGER.info("It took " + ((statisticsEndTime - startTime)/ 60000d) + " minutes for the whole process");
+        LOGGER.info("total elapsed time: " + ((statisticsEndTime - startTime)/ 60000d) + " min.");
 
     }
 }

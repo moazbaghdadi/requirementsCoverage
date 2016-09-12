@@ -61,11 +61,11 @@ public class ReportGenerator {
         long relevant = statisticsCalculator.countRelevantLines(issueId);
         long positive = statisticsCalculator.countPositivelyCoveredLines(issueId);
         long uncovered = relevant - covered;
-        double relevantLinesPercentage = 100 * relevant / (allLines!=0?allLines:1);
-        double totalCoverage = 100 * covered / (relevant!=0?relevant:1);
-        double positiveCoverage = 100 * positive / (covered!=0?covered:1);
-        double negativeCoverage = 100 * (covered-positive) / (covered!=0?covered:1);
-        double uncoveredPercentage = 100 * uncovered / (relevant!=0?relevant:1);
+        double relevantLinesPercentage = 100 * relevant / (allLines!=0?(double)allLines:1);
+        double totalCoverage = 100 * covered / (relevant!=0?(double)relevant:1);
+        double positiveCoverage = 100 * positive / (covered!=0?(double)covered:1);
+        double negativeCoverage = 100 * (covered-positive) / (covered!=0?(double)covered:1);
+        double uncoveredPercentage = 100 * uncovered / (relevant!=0?(double)relevant:1);
         Set<TestCase> testCases = statisticsCalculator.getTestCasesForIssue(issueId);
 
         writer.write("<article style=\"padding-left: 10%\">\n" +
