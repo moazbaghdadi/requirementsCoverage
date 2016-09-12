@@ -23,10 +23,10 @@ public class GitRepositoryAnalyserTest {
     @Before
     public void setUp() throws Exception {
         persistenceEntity = new PersistenceEntity(
-                "D:\\Dropbox\\TU\\Bachelorarbeit\\Requirements Coverage\\project\\qpid-java",
-                "D:\\Dropbox\\TU\\Bachelorarbeit\\Requirements Coverage\\project\\qpid-java\\bdbstore",
+                "D:/project/qpid-java",
+                "D:/project/qpid-java/bdbstore",
                 "QPID-\\d+");
-        Repository repository = new FileRepository("D:\\Dropbox\\TU\\Bachelorarbeit\\Requirements Coverage\\project\\qpid-java\\.git");
+        Repository repository = new FileRepository(persistenceEntity.getTargetRepositoryPath() + "/.git");
 
         RepositoryAnalyser gitRepositoryAnalyser = new GitRepositoryAnalyser(persistenceEntity, repository);
         gitRepositoryAnalyser.analyseRepository();

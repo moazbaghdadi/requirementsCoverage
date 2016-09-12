@@ -2,11 +2,13 @@ package at.ac.tuwien.ifs.qse.service;
 
 import at.ac.tuwien.ifs.qse.model.Line;
 import at.ac.tuwien.ifs.qse.persistence.PersistenceEntity;
+import at.ac.tuwien.ifs.qse.xmlParser.JaCoCoRelevanceSAXHandler;
 import at.ac.tuwien.ifs.qse.xmlParser.JaCoCoSAXHandler;
+import at.ac.tuwien.ifs.qse.xmlParser.ParserRunner;
 import org.junit.Before;
 import org.junit.Test;
-import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.XMLReaderFactory;
+
+import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
 
@@ -15,7 +17,8 @@ import static org.junit.Assert.assertEquals;
  */
 public class JaCoCoSAXHandlerTest {
     private PersistenceEntity persistenceEntity;
-    private JaCoCoSAXHandler handler;
+    private JaCoCoSAXHandler jaCoCoSAXHandler;
+    private JaCoCoRelevanceSAXHandler jaCoCoRelevanceSAXHandler;
 
     @Before
     public void setUp() throws Exception {
@@ -23,7 +26,8 @@ public class JaCoCoSAXHandlerTest {
         at.ac.tuwien.ifs.qse.model.TestCase testCase = new at.ac.tuwien.ifs.qse.model.TestCase("test1.java", true);
         persistenceEntity.getTestCases().add(testCase);
 
-        handler = new JaCoCoSAXHandler(persistenceEntity, testCase);
+        jaCoCoSAXHandler = new JaCoCoSAXHandler(persistenceEntity, testCase);
+        jaCoCoRelevanceSAXHandler = new JaCoCoRelevanceSAXHandler(persistenceEntity);
 
         persistenceEntity.addLine(new Line(1, "package.source1.java"));
         persistenceEntity.addLine(new Line(2, "package.source1.java"));
@@ -40,16 +44,14 @@ public class JaCoCoSAXHandlerTest {
 
     @Test
     public void testJaCoCoSAXHandler() throws Exception {
-        XMLReader parser = XMLReaderFactory.createXMLReader();
-        parser.setContentHandler(handler);
-        parser.setFeature("http://xml.org/sax/features/validation", false);
-        parser.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
-        parser.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+        ParserRunner parserRunner = new ParserRunner();
 
-        parser.parse("src/test/resources/jacoco.xml");
+        parserRunner.runXMLParser(jaCoCoRelevanceSAXHandler, Collections.singletonList("src/test/resources/jacoco.xml"));
+        parserRunner.runXMLParser(jaCoCoSAXHandler, Collections.singletonList("src/test/resources/jacoco.xml"));
 
-        assertEquals(10, persistenceEntity.getAllLines().size());
-        assertEquals(2, persistenceEntity.getAllLines().stream()
+        assertEquals(12, persistenceEntity.getAllLines().size());
+        assertEquals(6, persistenceEntity.getRelevantLines().size());
+        assertEquals(3, persistenceEntity.getRelevantLines().stream()
         .filter(line -> !line.getTestCases().isEmpty()).count());
     }
 }
