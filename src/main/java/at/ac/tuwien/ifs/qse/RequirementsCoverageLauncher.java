@@ -19,9 +19,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
-public class App 
+public class RequirementsCoverageLauncher
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger(App.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RequirementsCoverageLauncher.class);
     private static final long startTime = System.currentTimeMillis();
 
     public static void main( String[] args ) throws IOException {

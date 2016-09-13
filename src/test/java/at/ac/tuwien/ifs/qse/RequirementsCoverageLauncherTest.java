@@ -8,7 +8,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 /**
- * Unit test for simple App.
+ * Unit test for simple RequirementsCoverageLauncher.
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
@@ -17,6 +17,6 @@ import org.junit.runners.Suite;
         JaCoCoSAXHandlerTest.class,
         TestReportSAXHandlerTest.class
 })
-public class AppTest {
+public class RequirementsCoverageLauncherTest {
 
 }
