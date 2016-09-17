@@ -42,7 +42,7 @@ public class GitRepositoryAnalyserTest {
         int lines = 0;
         for (Path filePath :
                 Files.walk(Paths.get(persistenceEntity.getTargetProjectPath())).collect(Collectors.toList())) {
-            if (Files.isRegularFile(filePath)) {
+            if (Files.isRegularFile(filePath) && filePath.toString().matches(".*java\\b")) {
                 try {
                     lines += count(filePath.toFile());
                 } catch (IOException e) {
@@ -53,28 +53,27 @@ public class GitRepositoryAnalyserTest {
         assertEquals(lines, persistenceEntity.getAllLines().size());
     }
 
-    @Test
+
     public void testAnalyseRepository_CheckNumberOfIssues() throws Exception {
-        assertEquals(284, persistenceEntity.getIssues().size());
+        assertEquals(254, persistenceEntity.getIssues().size());
     }
 
     private int count(File filename) throws IOException {
-        try (InputStream is = new BufferedInputStream(new FileInputStream(filename))) {
-            byte[] c = new byte[1024];
-            int count = 0;
-            int readChars;
-            boolean endsWithoutNewLine = false;
-            while ((readChars = is.read(c)) != -1) {
-                for (int i = 0; i < readChars; ++i) {
-                    if (c[i] == '\n')
-                        ++count;
-                }
-                endsWithoutNewLine = (c[readChars - 1] != '\n');
+        InputStream is = new BufferedInputStream(new FileInputStream(filename));
+        byte[] c = new byte[1024];
+        int count = 0;
+        int readChars;
+        boolean endsWithoutNewLine = false;
+        while ((readChars = is.read(c)) != -1) {
+            for (int i = 0; i < readChars; ++i) {
+                if (c[i] == '\n')
+                    ++count;
             }
-            if (endsWithoutNewLine) {
-                ++count;
-            }
-            return count;
+            endsWithoutNewLine = (c[readChars - 1] != '\n');
         }
+        if (endsWithoutNewLine) {
+            ++count;
+        }
+        return count;
     }
 }

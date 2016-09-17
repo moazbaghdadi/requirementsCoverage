@@ -50,10 +50,10 @@ public class JaCoCo implements CodeCoverageTool {
 
     public void analyseCoverageReport(TestCase testCase) throws IOException, SAXException, MavenInvocationException {
         LOGGER.info("running maven goal: mvn clean test -q -Dtest=\"" + testCase.getTestCaseName() +
-                ".java\" -DfailIfNoTests=false");
+                "\" -DfailIfNoTests=false");
         RemoteMavenRunner.runRemoteMaven(persistence.getTargetProjectPath() + "/pom.xml",
                 Arrays.asList("clean", "test", "-q", "-Dtest=\"" + testCase.getTestCaseName()
-                        +".java\"", "-DfailIfNoTests=false"));
+                        + "\"", "-DfailIfNoTests=false"));
 
         LOGGER.info("running maven goal: jacoco:report -q");
         RemoteMavenRunner.runRemoteMaven(persistence.getTargetProjectPath() + "/pom.xml",

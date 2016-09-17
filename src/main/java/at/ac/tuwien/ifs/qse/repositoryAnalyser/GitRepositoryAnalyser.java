@@ -32,7 +32,7 @@ public class GitRepositoryAnalyser implements RepositoryAnalyser {
     public void analyseRepository() throws GitAPIException, IOException {
         List<String> projectFiles = new ArrayList<>();
         Files.walk(Paths.get(persistence.getTargetProjectPath())).forEach(filePath -> {
-            if (Files.isRegularFile(filePath)) {
+            if (Files.isRegularFile(filePath) && filePath.toString().matches(".*java\\b")) {
                 projectFiles.add(filePath.toString().substring(persistence.getTargetRepositoryPath().length()+1).replace("\\", "/"));
             }
         });
@@ -60,8 +60,7 @@ public class GitRepositoryAnalyser implements RepositoryAnalyser {
             RawText rawText = blameResult.getResultContents();
 
             for (int i = 0; i < rawText.size(); i++) {
-                lineNumber = blameResult.getSourceLine(i);
-                line = new Line(lineNumber, file.getFileName());
+                line = new Line(i, file.getFileName());
 
                 line.setRevisionNumber(blameResult.getSourceCommit(i).getName());
                 line.setIssueId(getIssueId(blameResult.getSourceCommit(i).getName()));

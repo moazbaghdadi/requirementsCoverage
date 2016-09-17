@@ -22,12 +22,9 @@ public class TestReportSAXHandler extends DefaultHandler {
                               String qualifiedName,
                               Attributes attributes) throws SAXException {
         if (qualifiedName.equals("testcase")){
-            String testCaseName = attributes.getValue("classname");
-            testCase = persistence.getTestCase(testCaseName);
-            if (testCase == null) {
-                testCase = new TestCase(testCaseName, true);
-                persistence.addTestCase(testCase);
-            }
+            String testCaseName = attributes.getValue("classname") + "#" + attributes.getValue("name");
+            testCase = new TestCase(testCaseName, true);
+            persistence.addTestCase(testCase);
         } else if (qualifiedName.equals("failure")){
             testCase.setPositive(false);
             persistence.addTestCase(testCase);
