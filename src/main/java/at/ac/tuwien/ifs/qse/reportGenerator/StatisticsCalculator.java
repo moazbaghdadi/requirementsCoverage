@@ -1,6 +1,7 @@
 package at.ac.tuwien.ifs.qse.reportGenerator;
 
 import at.ac.tuwien.ifs.qse.model.Line;
+import at.ac.tuwien.ifs.qse.model.Requirement;
 import at.ac.tuwien.ifs.qse.model.TestCase;
 import at.ac.tuwien.ifs.qse.persistence.Persistence;
 
@@ -88,5 +89,134 @@ class StatisticsCalculator {
                 .filter(line -> line.getIssueId() != null)
                 .filter(line -> line.getIssueId().equals(issueId))
                 .count();
+    }
+
+    long countRelevantLines(Requirement requirement) {
+        return persistence.getRelevantLines().stream()
+                .filter(line ->
+                        line.getIssueId() != null &&
+                        persistence.getIssue(line.getIssueId()) != null &&
+                        persistence.getIssue(line.getIssueId()).getRequirement() != null &&
+                        persistence.getIssue(line.getIssueId()).getRequirement().equals(requirement))
+                .count();
+    }
+
+    long countCoveredLines(Requirement requirement) {
+        return persistence.getRelevantLines().stream()
+                .filter(line ->
+                        line.getIssueId() != null &&
+                        persistence.getIssue(line.getIssueId()) != null &&
+                        persistence.getIssue(line.getIssueId()).getRequirement() != null &&
+                        persistence.getIssue(line.getIssueId()).getRequirement().equals(requirement))
+                .filter(line -> !line.getTestCases().isEmpty())
+                .count();
+    }
+
+    long countPositivelyCoveredLines(Requirement requirement) {
+        return persistence.getRelevantLines().stream()
+                .filter(line ->
+                        line.getIssueId() != null &&
+                        persistence.getIssue(line.getIssueId()) != null &&
+                        persistence.getIssue(line.getIssueId()).getRequirement() != null &&
+                        persistence.getIssue(line.getIssueId()).getRequirement().equals(requirement))
+                .filter(line -> !line.getTestCases().isEmpty())
+                .filter(line -> line.getTestCases().stream()
+                        .allMatch(TestCase::isPositive))
+                .count();
+    }
+
+    long countLines(Requirement requirement) {
+        return persistence.getAllLines().stream()
+                .filter(line ->
+                        line.getIssueId() != null &&
+                        persistence.getIssue(line.getIssueId()) != null &&
+                        persistence.getIssue(line.getIssueId()).getRequirement() != null &&
+                        persistence.getIssue(line.getIssueId()).getRequirement().equals(requirement))
+                .count();
+    }
+
+    long countNotRelatedToRequirementLines() {
+        return persistence.getAllLines().stream()
+                .filter(line ->
+                        (line.getIssueId() != null &&
+                        persistence.getIssue(line.getIssueId()) != null &&
+                        persistence.getIssue(line.getIssueId()).getRequirement() == null) ||
+                        (line.getIssueId() == null))
+                .count();
+    }
+
+    long countNotRelatedToRequirementCoveredLines() {
+        return persistence.getRelevantLines().stream()
+                .filter(line ->
+                        (line.getIssueId() != null &&
+                        persistence.getIssue(line.getIssueId()) != null &&
+                        persistence.getIssue(line.getIssueId()).getRequirement() == null) ||
+                        (line.getIssueId() == null))
+                .filter(line -> !line.getTestCases().isEmpty())
+                .count();
+    }
+
+    long countNotRelatedToRequirementRelevantLines() {
+        return persistence.getRelevantLines().stream()
+                .filter(line ->
+                        (line.getIssueId() != null &&
+                        persistence.getIssue(line.getIssueId()) != null &&
+                        persistence.getIssue(line.getIssueId()).getRequirement() == null) ||
+                        (line.getIssueId() == null))
+                .count();
+    }
+
+    long countNotRelatedToRequirementPositivelyCoveredLines() {
+        return persistence.getRelevantLines().stream()
+                .filter(line ->
+                        (line.getIssueId() != null &&
+                        persistence.getIssue(line.getIssueId()) != null &&
+                        persistence.getIssue(line.getIssueId()).getRequirement() == null) ||
+                        (line.getIssueId() == null))
+                .filter(line -> !line.getTestCases().isEmpty())
+                .filter(line -> line.getTestCases().stream()
+                        .allMatch(TestCase::isPositive))
+                .count();
+    }
+
+    long countNotRelatedToIssueLines() {
+        return persistence.getAllLines().stream()
+                .filter(line -> line.getIssueId() == null)
+                .count();
+    }
+
+    long countNotRelatedToIssueCoveredLines() {
+        return persistence.getRelevantLines().stream()
+                .filter(line -> line.getIssueId() == null)
+                .filter(line -> !line.getTestCases().isEmpty())
+                .count();
+    }
+
+    long countNotRelatedToIssueRelevantLines() {
+        return persistence.getRelevantLines().stream()
+                .filter(line -> line.getIssueId() == null)
+                .count();
+    }
+
+    long countNotRelatedToIssuePositivelyCoveredLines() {
+        return persistence.getRelevantLines().stream()
+                .filter(line -> line.getIssueId() == null)
+                .filter(line -> !line.getTestCases().isEmpty())
+                .filter(line -> line.getTestCases().stream()
+                        .allMatch(TestCase::isPositive))
+                .count();
+    }
+
+    Set<TestCase> getNotRelatedToIssuesTestCases() {
+        List<Line> relevant = persistence.getRelevantLines().stream()
+                .filter(line -> line.getIssueId() == null)
+                .filter(line -> !line.getTestCases().isEmpty())
+                .collect(Collectors.toList());
+        Set<TestCase> testCases = new HashSet<>();
+        for (Line line :
+                relevant) {
+            testCases.addAll(line.getTestCases());
+        }
+        return testCases;
     }
 }

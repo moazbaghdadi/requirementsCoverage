@@ -1,9 +1,6 @@
 package at.ac.tuwien.ifs.qse.persistence;
 
-import at.ac.tuwien.ifs.qse.model.File;
-import at.ac.tuwien.ifs.qse.model.Issue;
-import at.ac.tuwien.ifs.qse.model.Line;
-import at.ac.tuwien.ifs.qse.model.TestCase;
+import at.ac.tuwien.ifs.qse.model.*;
 
 import java.util.Set;
 
@@ -139,6 +136,31 @@ public interface Persistence {
     Set<Line> getRelevantLines();
 
     /**
+     * Persists the given requirement. If the requirement already exists,
+     * it will be replaced with the new requirement.
+     *
+     * @param requirement the requirement to be added
+     */
+    void addRequirement(Requirement requirement);
+
+    /**
+     * Returns the requirement with the given line number and file name. If the
+     * requirement doesn't exist, returns null.
+     *
+     * @param requirementId the id of the requirement to be returned.
+     * @return the requirement with the given requirement id. If the
+     * requirement doesn't exist, returns null
+     */
+    Requirement getRequirement(String requirementId);
+
+    /**
+     * Returns a set containing all requirements.
+     *
+     * @return a set containing all requirements.
+     */
+    Set<Requirement> getRequirements();
+
+    /**
      * sets the path to the target project's repository.
      *
      * @param targetRepositoryPath the path to the target project's repository.
@@ -184,4 +206,18 @@ public interface Persistence {
      * target project
      */
     String getIssueIdsRegEx();
+
+    /**
+     * sets the path to the requirements of the target project.
+     *
+     * @param requirementsPath the path to the requirements of the target project.
+     */
+    void setRequirementsPath(String requirementsPath);
+
+    /**
+     * gets the path to the requirements of the target project.
+     *
+     * @return the path to the requirements of the target project
+     */
+    String getRequirementsPath();
 }

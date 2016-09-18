@@ -25,7 +25,8 @@ public class GitRepositoryAnalyserTest {
         persistenceEntity = new PersistenceEntity(
                 "D:/project/qpid-java",
                 "D:/project/qpid-java/bdbstore",
-                "QPID-\\d+");
+                "QPID-\\d+",
+                null);
         Repository repository = new FileRepository(persistenceEntity.getTargetRepositoryPath() + "/.git");
 
         RepositoryAnalyser gitRepositoryAnalyser = new GitRepositoryAnalyser(persistenceEntity, repository);
@@ -34,7 +35,7 @@ public class GitRepositoryAnalyserTest {
 
     @Test
     public void testAnalyseRepository_CheckNumberOfFiles() throws Exception {
-        assertEquals(150, persistenceEntity.getFiles().size());
+        assertEquals(113, persistenceEntity.getFiles().size());
     }
 
     @Test
@@ -53,7 +54,7 @@ public class GitRepositoryAnalyserTest {
         assertEquals(lines, persistenceEntity.getAllLines().size());
     }
 
-
+    @Test
     public void testAnalyseRepository_CheckNumberOfIssues() throws Exception {
         assertEquals(254, persistenceEntity.getIssues().size());
     }

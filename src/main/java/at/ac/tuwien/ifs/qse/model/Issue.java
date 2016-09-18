@@ -10,6 +10,7 @@ public class Issue implements Comparable<Issue> {
 
     private String issueId;
     private List<String> revisionIds;
+    private Requirement requirement;
     private int lines;
     private int CoveredLines;
     private int positiveCoveredLines;
@@ -60,6 +61,14 @@ public class Issue implements Comparable<Issue> {
 
     public void incrementPositiveCoveredLines() {
         this.positiveCoveredLines++;
+    }
+
+    public Requirement getRequirement() {
+        return requirement;
+    }
+
+    public void setRequirement(Requirement requirement) {
+        this.requirement = requirement;
     }
 
     @Override

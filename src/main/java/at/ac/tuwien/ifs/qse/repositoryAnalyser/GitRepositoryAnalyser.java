@@ -49,7 +49,6 @@ public class GitRepositoryAnalyser implements RepositoryAnalyser {
         BlameResult blameResult  = blameCommand.call();
 
         Line line;
-        int lineNumber;
 
         File file = persistence.getFile(filePath.replace("/", "."));
         if (file == null) {

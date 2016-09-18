@@ -1,9 +1,6 @@
 package at.ac.tuwien.ifs.qse.persistence;
 
-import at.ac.tuwien.ifs.qse.model.File;
-import at.ac.tuwien.ifs.qse.model.Issue;
-import at.ac.tuwien.ifs.qse.model.Line;
-import at.ac.tuwien.ifs.qse.model.TestCase;
+import at.ac.tuwien.ifs.qse.model.*;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -15,20 +12,27 @@ public class PersistenceEntity implements Persistence {
 
     private Set<File> files;
     private Set<Issue> issues;
+    private Set<Requirement> requirements;
     private Set<TestCase> testCases;
     private Set<Line> allLines;
     private Set<Line> relevantLines;
     private String targetRepositoryPath;
     private String targetProjectPath;
     private String issueIdsRegEx;
+    private String requirementsPath;
 
-    public PersistenceEntity(String targetRepositoryPath, String targetProjectPath, String commitsRegEx) {
+    public PersistenceEntity(String targetRepositoryPath,
+                             String targetProjectPath,
+                             String commitsRegEx,
+                             String requirementsPath) {
         this.targetRepositoryPath = targetRepositoryPath;
         this.targetProjectPath = targetProjectPath;
         this.issueIdsRegEx = commitsRegEx;
+        this.requirementsPath = requirementsPath;
 
         files = new HashSet<>();
         issues = new HashSet<>();
+        requirements = new HashSet<>();
         testCases = new HashSet<>();
         allLines = new HashSet<>();
         relevantLines = new HashSet<>();
@@ -138,7 +142,28 @@ public class PersistenceEntity implements Persistence {
 
     @Override
     public Set<Line> getRelevantLines() {
-        return relevantLines;
+        return new HashSet<>(relevantLines);
+    }
+
+    @Override
+    public void addRequirement(Requirement requirement) {
+        if (requirements.contains(requirement)) {
+            requirements.remove(requirement);
+        }
+        requirements.add(requirement);
+    }
+
+    @Override
+    public Requirement getRequirement(String requirementId) {
+        return requirements.stream()
+                .filter(requirement -> requirement.getRequirementId().equals(requirementId))
+                .findAny()
+                .orElse(null);
+    }
+
+    @Override
+    public Set<Requirement> getRequirements() {
+        return new HashSet<>(requirements);
     }
 
     @Override
@@ -172,10 +197,21 @@ public class PersistenceEntity implements Persistence {
     }
 
     @Override
+    public void setRequirementsPath(String requirementsPath) {
+        this.requirementsPath = requirementsPath;
+    }
+
+    @Override
+    public String getRequirementsPath() {
+        return requirementsPath;
+    }
+
+    @Override
     public String toString() {
         return "PersistenceEntity{" +
                 "files=" + files.size() +
                 ", issues=" + issues.size() +
+                ", requirements" + requirements.size() +
                 ", testCases=" + testCases.size() +
                 ", allLines=" + allLines.size() +
                 ", relevantLines=" + relevantLines.size() +

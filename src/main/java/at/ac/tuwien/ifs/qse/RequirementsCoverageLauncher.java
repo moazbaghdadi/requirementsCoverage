@@ -7,6 +7,7 @@ import at.ac.tuwien.ifs.qse.persistence.PersistenceEntity;
 import at.ac.tuwien.ifs.qse.reportGenerator.ReportGenerator;
 import at.ac.tuwien.ifs.qse.repositoryAnalyser.GitRepositoryAnalyser;
 import at.ac.tuwien.ifs.qse.repositoryAnalyser.RepositoryAnalyser;
+import at.ac.tuwien.ifs.qse.requirementsParser.RequirementsParser;
 import at.ac.tuwien.ifs.qse.service.RemoteMavenRunner;
 import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -25,14 +26,15 @@ public class RequirementsCoverageLauncher
     private static final long startTime = System.currentTimeMillis();
 
     public static void main( String[] args ) throws IOException {
-        if (args.length != 3) {
+        if (args.length != 4) {
             LOGGER.error("wrong number of arguments. required arguments: targetRepositoryPath targetProjectPath issueIdRegEx");
             return;
         }
         String targetRepositoryPath = args[0];
         String targetProjectPath = args[1];
-        String issueIdRegEx = args[2];
-        Persistence persistence = new PersistenceEntity(targetRepositoryPath, targetProjectPath, issueIdRegEx);
+        String requirementsPath = args[2];
+        String issueIdRegEx = args[3];
+        Persistence persistence = new PersistenceEntity(targetRepositoryPath, targetProjectPath, issueIdRegEx, requirementsPath);
 
         // clean project
         try {
@@ -59,16 +61,28 @@ public class RequirementsCoverageLauncher
         long repoEndTime = System.currentTimeMillis();
         LOGGER.info("repository parsed, elapsed time: " + ((repoEndTime - startTime)/ 1000d) + " sec.");
 
+        // parsing Requirements
+        LOGGER.info("parsing requirements...");
+        RequirementsParser requirementsParser = new RequirementsParser(persistence);
+        try {
+            requirementsParser.parseRequirements();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        LOGGER.info(persistence.toString());
+        long reqsEndTime = System.currentTimeMillis();
+        LOGGER.info("requirements parsed, elapsed time: " + ((reqsEndTime - repoEndTime)/ 1000d) + " sec.");
+
         // parsing test and coverage reports
         CoverageAnalyser coverageAnalyser = new CoverageAnalyser(persistence, new JaCoCo(persistence));
         coverageAnalyser.analyzeCoverage();
 
         long parsingEndTime = System.currentTimeMillis();
-        LOGGER.info("test and coverage reports parsed, elapsed time " + ((parsingEndTime - repoEndTime)/ 60000d) + " min.");
+        LOGGER.info("test and coverage reports parsed, elapsed time " + ((parsingEndTime - reqsEndTime)/ 60000d) + " min.");
 
         // printReport
         ReportGenerator reportGenerator = new ReportGenerator(persistence);
-        reportGenerator.printOutStatistics();
+        reportGenerator.generateReport();
 
         long statisticsEndTime = System.currentTimeMillis();
         LOGGER.info("requirements coverage report generated, elapsed time: " + ((statisticsEndTime - parsingEndTime)/ 1000d) + " sec.");

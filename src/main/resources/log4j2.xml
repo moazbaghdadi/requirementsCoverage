@@ -5,7 +5,8 @@
             <PatternLayout pattern="%t %-5p %c{2} - %m%n"/>
         </File>-->
         <Console name="console" target="SYSTEM_OUT">
-            <PatternLayout pattern="%d %-5p %C{2} (%F:%L) - %m%n"/>
+            <!--<PatternLayout pattern="%d %-5p %C{2} (%F:%L) - %m%n"/>-->
+            <PatternLayout pattern="%-5p %C{2} (%F:%L) - %m%n"/>
         </Console>
     </Appenders>
     <Loggers>

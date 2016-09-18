@@ -1,9 +1,6 @@
 package at.ac.tuwien.ifs.qse.reportGenerator;
 
-import at.ac.tuwien.ifs.qse.model.File;
-import at.ac.tuwien.ifs.qse.model.Issue;
-import at.ac.tuwien.ifs.qse.model.Line;
-import at.ac.tuwien.ifs.qse.model.TestCase;
+import at.ac.tuwien.ifs.qse.model.*;
 import at.ac.tuwien.ifs.qse.persistence.PersistenceEntity;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,23 +13,81 @@ import static org.junit.Assert.assertEquals;
 public class StatisticsCalculatorTest{
 
     private StatisticsCalculator statisticsCalculator;
+    private Requirement requirement1;
+    private Requirement requirement2;
+    private Requirement requirement3;
 
     @Before
     public void setUp() throws Exception {
-        PersistenceEntity persistenceEntity = new PersistenceEntity(null, null, null);
 
+        PersistenceEntity persistenceEntity = new PersistenceEntity(null, null, null, null);
+
+        /*
+            Model:
+            requirement1 {
+                issue 1 {
+                    Line 1  <---> Relevant <---> TestCase1 {positive}
+                    Line 2  <---> Relevant <---> --------------------
+                    Line 3  <---> Relevant <---> TestCase4 {negative}
+                }
+                issue 2 {
+                    Line 4  <---> Relevant <---> TestCase1 {positive}
+                    Line 5  <---> -------- <---> TestCase4 {negative}
+                    Line 6  <---> Relevant <---> --------------------
+                }
+                issue 3 {
+                    Line 7  <---> Relevant <---> TestCase1 {positive}
+                }
+            }
+            requirement 2 {
+                issue 4 {
+                    Line 8  <---> Relevant <---> TestCase4 {negative}
+                }
+                issue 5 {
+                    Line 9  <---> Relevant <---> TestCase4 {negative}
+                }
+            }
+            requirement 3 {
+            }
+            no requirement {
+                issue 6 {
+                        Line 10 <---> -------- <---> TestCase4 {negative}
+                }
+            }
+
+         */
         Issue issue1 = new Issue("issue 1");
         Issue issue2 = new Issue("issue 2");
         Issue issue3 = new Issue("issue 3");
         Issue issue4 = new Issue("issue 4");
         Issue issue5 = new Issue("issue 5");
         Issue issue6 = new Issue("issue 6");
+        requirement1 = new Requirement("requirement1");
+        requirement2 = new Requirement("requirement2");
+        requirement3 = new Requirement("requirement3");
+
+        requirement1.addIssue(issue1);
+        requirement1.addIssue(issue2);
+        requirement1.addIssue(issue3);
+        issue1.setRequirement(requirement1);
+        issue2.setRequirement(requirement1);
+        issue3.setRequirement(requirement1);
+
+        requirement2.addIssue(issue4);
+        requirement2.addIssue(issue5);
+        issue4.setRequirement(requirement2);
+        issue5.setRequirement(requirement2);
+
         persistenceEntity.addIssue(issue1);
         persistenceEntity.addIssue(issue2);
         persistenceEntity.addIssue(issue3);
         persistenceEntity.addIssue(issue4);
         persistenceEntity.addIssue(issue5);
         persistenceEntity.addIssue(issue6);
+
+        persistenceEntity.addRequirement(requirement1);
+        persistenceEntity.addRequirement(requirement2);
+        persistenceEntity.addRequirement(requirement3);
 
         TestCase testCase1 = new TestCase("test1", true);
         TestCase testCase2 = new TestCase("test2", true);
@@ -92,7 +147,6 @@ public class StatisticsCalculatorTest{
         Line line5 = new Line(1, "file3");
         line5.setIssueId("issue 2");
         line5.addTestCase(testCase4);
-        persistenceEntity.addRelevantLine(line5);
         persistenceEntity.addLine(line5);
 
         Line line6 = new Line(1, "file4");
@@ -133,12 +187,12 @@ public class StatisticsCalculatorTest{
 
     @Test
     public void testRelevantLines() throws Exception {
-        assertEquals(9, statisticsCalculator.countRelevantLines());
+        assertEquals(8, statisticsCalculator.countRelevantLines());
     }
 
     @Test
     public void testCountCoveredLines() throws Exception {
-        assertEquals(7, statisticsCalculator.countCoveredLines());
+        assertEquals(6, statisticsCalculator.countCoveredLines());
     }
 
     @Test
@@ -149,7 +203,7 @@ public class StatisticsCalculatorTest{
     @Test
     public void testCountRelevantLinesForIssue() throws Exception {
         assertEquals(3, statisticsCalculator.countRelevantLines("issue 1"));
-        assertEquals(3, statisticsCalculator.countRelevantLines("issue 2"));
+        assertEquals(2, statisticsCalculator.countRelevantLines("issue 2"));
         assertEquals(1, statisticsCalculator.countRelevantLines("issue 3"));
         assertEquals(1, statisticsCalculator.countRelevantLines("issue 4"));
         assertEquals(1, statisticsCalculator.countRelevantLines("issue 5"));
@@ -159,7 +213,7 @@ public class StatisticsCalculatorTest{
     @Test
     public void testCountCoveredLinesForIssue() throws Exception {
         assertEquals(2, statisticsCalculator.countCoveredLines("issue 1"));
-        assertEquals(2, statisticsCalculator.countCoveredLines("issue 2"));
+        assertEquals(1, statisticsCalculator.countCoveredLines("issue 2"));
         assertEquals(1, statisticsCalculator.countCoveredLines("issue 3"));
         assertEquals(1, statisticsCalculator.countCoveredLines("issue 4"));
         assertEquals(1, statisticsCalculator.countCoveredLines("issue 5"));
@@ -179,10 +233,38 @@ public class StatisticsCalculatorTest{
     @Test
     public void testNumberOfTestCasesForIssue() throws Exception {
         assertEquals(2, statisticsCalculator.getTestCasesForIssue("issue 1").size());
-        assertEquals(2, statisticsCalculator.getTestCasesForIssue("issue 2").size());
+        assertEquals(1, statisticsCalculator.getTestCasesForIssue("issue 2").size());
         assertEquals(1, statisticsCalculator.getTestCasesForIssue("issue 3").size());
         assertEquals(1, statisticsCalculator.getTestCasesForIssue("issue 4").size());
         assertEquals(1, statisticsCalculator.getTestCasesForIssue("issue 5").size());
         assertEquals(0, statisticsCalculator.getTestCasesForIssue("issue 6").size());
+    }
+
+    @Test
+    public void testCountRelevantLinesForRequirement() throws Exception {
+        assertEquals(6, statisticsCalculator.countRelevantLines(requirement1));
+        assertEquals(2, statisticsCalculator.countRelevantLines(requirement2));
+        assertEquals(0, statisticsCalculator.countRelevantLines(requirement3));
+    }
+
+    @Test
+    public void testCountCoveredLinesForRequirement() throws Exception {
+        assertEquals(4, statisticsCalculator.countCoveredLines(requirement1));
+        assertEquals(2, statisticsCalculator.countCoveredLines(requirement2));
+        assertEquals(0, statisticsCalculator.countCoveredLines(requirement3));
+    }
+
+    @Test
+    public void testCountPositivelyCoveredLinesForRequirement() throws Exception {
+        assertEquals(3, statisticsCalculator.countPositivelyCoveredLines(requirement1));
+        assertEquals(0, statisticsCalculator.countPositivelyCoveredLines(requirement2));
+        assertEquals(0, statisticsCalculator.countPositivelyCoveredLines(requirement3));
+    }
+
+    @Test
+    public void testCountLinesForRequirement() throws Exception {
+        assertEquals(7, statisticsCalculator.countLines(requirement1));
+        assertEquals(2, statisticsCalculator.countLines(requirement2));
+        assertEquals(0, statisticsCalculator.countLines(requirement3));
     }
 }

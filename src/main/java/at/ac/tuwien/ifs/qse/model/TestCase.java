@@ -3,7 +3,7 @@ package at.ac.tuwien.ifs.qse.model;
 /**
  * Represents a Test Case.
  */
-public class TestCase {
+public class TestCase implements Comparable<TestCase>{
 
     private String testCaseName;
     private boolean positive;
@@ -43,5 +43,10 @@ public class TestCase {
     @Override
     public int hashCode() {
         return testCaseName.hashCode();
+    }
+
+    @Override
+    public int compareTo(TestCase o) {
+        return testCaseName.compareTo(o.getTestCaseName());
     }
 }
