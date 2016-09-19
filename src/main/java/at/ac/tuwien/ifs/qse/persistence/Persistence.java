@@ -220,4 +220,16 @@ public interface Persistence {
      * @return the path to the requirements of the target project
      */
     String getRequirementsPath();
+
+    /**
+     * set a flag to decide showing a warning message in the report.
+     */
+    void setShowWarning(boolean showWarning);
+
+    /**
+     * returns true if a warning message should be shawn in the report.
+     * @return true if a warning message should be shawn in the report, otherwise false.
+     */
+    boolean showWarning();
+
 }

@@ -11,6 +11,8 @@ import org.eclipse.jgit.blame.BlameResult;
 import org.eclipse.jgit.diff.RawText;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -21,6 +23,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class GitRepositoryAnalyser implements RepositoryAnalyser {
+    private static final Logger LOGGER = LoggerFactory.getLogger(GitRepositoryAnalyser.class);
     private Persistence persistence;
     private Git git;
 
@@ -29,16 +32,38 @@ public class GitRepositoryAnalyser implements RepositoryAnalyser {
         this.git = new Git(repository);
     }
 
-    public void analyseRepository() throws GitAPIException, IOException {
+    public void analyseRepository() {
+        LOGGER.info("parsing repository...");
+        int failuresCounter = 0;
+        List<Throwable> exceptions = new ArrayList<>();
+
         List<String> projectFiles = new ArrayList<>();
-        Files.walk(Paths.get(persistence.getTargetProjectPath())).forEach(filePath -> {
-            if (Files.isRegularFile(filePath) && filePath.toString().matches(".*java\\b")) {
-                projectFiles.add(filePath.toString().substring(persistence.getTargetRepositoryPath().length()+1).replace("\\", "/"));
-            }
-        });
+        try {
+            Files.walk(Paths.get(persistence.getTargetProjectPath())).forEach(filePath -> {
+                if (Files.isRegularFile(filePath) && filePath.toString().matches(".*java\\b")) {
+                    projectFiles.add(filePath.toString().substring(persistence.getTargetRepositoryPath().length()+1).replace("\\", "/"));
+                }
+            });
+        } catch (IOException e) {
+            failuresCounter ++;
+            exceptions.add(e);
+            persistence.setShowWarning(true);
+        }
         for (String filePath :
                 projectFiles) {
-            getLinesInfo(filePath);
+            try {
+                getLinesInfo(filePath);
+            } catch (GitAPIException | IOException e) {
+                failuresCounter ++;
+                exceptions.add(e);
+                persistence.setShowWarning(true);
+            }
+        }
+
+        if (failuresCounter != 0) {
+            LOGGER.error(failuresCounter + " failure(s) happened while parsing the repository.");
+            LOGGER.error("listing failures...");
+            exceptions.forEach(throwable -> LOGGER.error(throwable.getMessage(), throwable));
         }
     }
 
@@ -68,7 +93,7 @@ public class GitRepositoryAnalyser implements RepositoryAnalyser {
             }
             persistence.addFile(file);
         } catch (NullPointerException e){
-            //nothing to be done, the file is simply doesn't exist in the repository (ex: .git, .idea,...)
+            //nothing to be done, the file doesn't exist in the repository (ex: .git, .idea,...)
         }
     }
 

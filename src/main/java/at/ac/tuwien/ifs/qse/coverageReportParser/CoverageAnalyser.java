@@ -33,22 +33,27 @@ public class CoverageAnalyser {
     }
 
     public void analyzeCoverage() {
-        LOGGER.info("Starting coverage analyses...");
+        LOGGER.info("analyzing coverage...");
+        int failureCounter = 0;
+        List<Throwable> exceptions = new ArrayList<>();
+
+        LOGGER.info("analyzing test reports...");
         try {
-            LOGGER.info("analyzing test reports...");
             analyseTestReports();
         } catch (Exception e) {
-            LOGGER.error("Error while analyzing test reports: " + e.getMessage(), e);
+            failureCounter ++;
+            exceptions.add(e);
+            persistence.setShowWarning(true);
         }
-        LOGGER.info(persistence.toString());
 
         LOGGER.info("identifying relevant lines...");
         try {
             codeCoverageTool.analyseRelevantLines();
         } catch (Exception e) {
-            LOGGER.error("Error while analyzing relevant lines: " + e.getMessage(), e);
+            failureCounter ++;
+            exceptions.add(e);
+            persistence.setShowWarning(true);
         }
-        LOGGER.info(persistence.toString());
 
         LOGGER.info("analyzing coverage reports...");
         int numberOfTests = persistence.getTestCases().size();
@@ -58,10 +63,17 @@ public class CoverageAnalyser {
                 LOGGER.info("analysing report for test case " + current++ + "/" + numberOfTests);
                 codeCoverageTool.analyseCoverageReport(testCase);
             } catch (Exception e) {
-                LOGGER.error("Error while analyzing coverage report of " + testCase.getTestCaseName() + ": " + e.getMessage(), e);
+                failureCounter ++;
+                exceptions.add(e);
+                persistence.setShowWarning(true);
             }
         }
-        LOGGER.info(persistence.toString());
+
+        if (failureCounter != 0) {
+            LOGGER.error(failureCounter + " failure(s) happened while analyzing test & coverage reports.");
+            LOGGER.error("listing failures");
+            exceptions.forEach(throwable -> LOGGER.error(throwable.getMessage(), throwable));
+        }
     }
 
     /**

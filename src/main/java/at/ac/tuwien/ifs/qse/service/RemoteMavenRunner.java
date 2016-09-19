@@ -9,7 +9,7 @@ import java.io.InputStreamReader;
 import java.util.List;
 
 /**
- * Runns the given maven goals on the given project.
+ * Runs the given maven goals on the given project.
  */
 public class RemoteMavenRunner {
 

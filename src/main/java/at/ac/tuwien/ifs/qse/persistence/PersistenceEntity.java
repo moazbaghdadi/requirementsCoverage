@@ -20,6 +20,7 @@ public class PersistenceEntity implements Persistence {
     private String targetProjectPath;
     private String issueIdsRegEx;
     private String requirementsPath;
+    private boolean showWarning;
 
     public PersistenceEntity(String targetRepositoryPath,
                              String targetProjectPath,
@@ -29,6 +30,7 @@ public class PersistenceEntity implements Persistence {
         this.targetProjectPath = targetProjectPath;
         this.issueIdsRegEx = commitsRegEx;
         this.requirementsPath = requirementsPath;
+        this.showWarning = false;
 
         files = new HashSet<>();
         issues = new HashSet<>();
@@ -204,6 +206,16 @@ public class PersistenceEntity implements Persistence {
     @Override
     public String getRequirementsPath() {
         return requirementsPath;
+    }
+
+    @Override
+    public void setShowWarning(boolean showWarning) {
+        this.showWarning = showWarning;
+    }
+
+    @Override
+    public boolean showWarning() {
+        return showWarning;
     }
 
     @Override

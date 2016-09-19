@@ -10,9 +10,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-/**
- * Calculates different statistics about the project.
- */
 class StatisticsCalculator {
 
     private Persistence persistence;
@@ -21,9 +18,20 @@ class StatisticsCalculator {
         this.persistence = persistence;
     }
 
-    long getNumberOfPositiveTests() {
-        return persistence.getTestCases().stream()
-                .filter(TestCase::isPositive)
+    long countLines(String issueId) {
+        return persistence.getAllLines().stream()
+                .filter(line -> line.getIssueId() != null)
+                .filter(line -> line.getIssueId().equals(issueId))
+                .count();
+    }
+
+    long countLines(Requirement requirement) {
+        return persistence.getAllLines().stream()
+                .filter(line ->
+                        line.getIssueId() != null &&
+                                persistence.getIssue(line.getIssueId()) != null &&
+                                persistence.getIssue(line.getIssueId()).getRequirement() != null &&
+                                persistence.getIssue(line.getIssueId()).getRequirement().equals(requirement))
                 .count();
     }
 
@@ -31,8 +39,44 @@ class StatisticsCalculator {
         return persistence.getRelevantLines().size();
     }
 
+    long countRelevantLines(String issueId) {
+        return persistence.getRelevantLines().stream()
+                .filter(line -> line.getIssueId() != null)
+                .filter(line -> line.getIssueId().equals(issueId))
+                .count();
+    }
+
+    long countRelevantLines(Requirement requirement) {
+        return persistence.getRelevantLines().stream()
+                .filter(line ->
+                        line.getIssueId() != null &&
+                                persistence.getIssue(line.getIssueId()) != null &&
+                                persistence.getIssue(line.getIssueId()).getRequirement() != null &&
+                                persistence.getIssue(line.getIssueId()).getRequirement().equals(requirement))
+                .count();
+    }
+
     long countCoveredLines() {
         return persistence.getRelevantLines().stream()
+                .filter(line -> !line.getTestCases().isEmpty())
+                .count();
+    }
+
+    long countCoveredLines(String issueId) {
+        return persistence.getRelevantLines().stream()
+                .filter(line -> line.getIssueId() != null)
+                .filter(line -> line.getIssueId().equals(issueId))
+                .filter(line -> !line.getTestCases().isEmpty())
+                .count();
+    }
+
+    long countCoveredLines(Requirement requirement) {
+        return persistence.getRelevantLines().stream()
+                .filter(line ->
+                        line.getIssueId() != null &&
+                                persistence.getIssue(line.getIssueId()) != null &&
+                                persistence.getIssue(line.getIssueId()).getRequirement() != null &&
+                                persistence.getIssue(line.getIssueId()).getRequirement().equals(requirement))
                 .filter(line -> !line.getTestCases().isEmpty())
                 .count();
     }
@@ -45,21 +89,6 @@ class StatisticsCalculator {
                 .count();
     }
 
-    long countRelevantLines(String issueId) {
-        return persistence.getRelevantLines().stream()
-                .filter(line -> line.getIssueId() != null)
-                .filter(line -> line.getIssueId().equals(issueId))
-                .count();
-    }
-
-    long countCoveredLines(String issueId) {
-        return persistence.getRelevantLines().stream()
-                .filter(line -> line.getIssueId() != null)
-                .filter(line -> line.getIssueId().equals(issueId))
-                .filter(line -> !line.getTestCases().isEmpty())
-                .count();
-    }
-
     long countPositivelyCoveredLines(String issueId) {
         return persistence.getRelevantLines().stream()
                 .filter(line -> line.getIssueId() != null)
@@ -67,6 +96,25 @@ class StatisticsCalculator {
                 .filter(line -> !line.getTestCases().isEmpty())
                 .filter(line -> line.getTestCases().stream()
                         .allMatch(TestCase::isPositive))
+                .count();
+    }
+
+    long countPositivelyCoveredLines(Requirement requirement) {
+        return persistence.getRelevantLines().stream()
+                .filter(line ->
+                        line.getIssueId() != null &&
+                        persistence.getIssue(line.getIssueId()) != null &&
+                        persistence.getIssue(line.getIssueId()).getRequirement() != null &&
+                        persistence.getIssue(line.getIssueId()).getRequirement().equals(requirement))
+                .filter(line -> !line.getTestCases().isEmpty())
+                .filter(line -> line.getTestCases().stream()
+                        .allMatch(TestCase::isPositive))
+                .count();
+    }
+
+    long getNumberOfPositiveTests() {
+        return persistence.getTestCases().stream()
+                .filter(TestCase::isPositive)
                 .count();
     }
 
@@ -84,54 +132,22 @@ class StatisticsCalculator {
         return testCases;
     }
 
-    long countLines(String issueId) {
-        return persistence.getAllLines().stream()
-                .filter(line -> line.getIssueId() != null)
-                .filter(line -> line.getIssueId().equals(issueId))
-                .count();
-    }
-
-    long countRelevantLines(Requirement requirement) {
-        return persistence.getRelevantLines().stream()
-                .filter(line ->
-                        line.getIssueId() != null &&
-                        persistence.getIssue(line.getIssueId()) != null &&
-                        persistence.getIssue(line.getIssueId()).getRequirement() != null &&
-                        persistence.getIssue(line.getIssueId()).getRequirement().equals(requirement))
-                .count();
-    }
-
-    long countCoveredLines(Requirement requirement) {
-        return persistence.getRelevantLines().stream()
-                .filter(line ->
-                        line.getIssueId() != null &&
-                        persistence.getIssue(line.getIssueId()) != null &&
-                        persistence.getIssue(line.getIssueId()).getRequirement() != null &&
-                        persistence.getIssue(line.getIssueId()).getRequirement().equals(requirement))
+    Set<TestCase> getNotRelatedToIssuesTestCases() {
+        List<Line> relevant = persistence.getRelevantLines().stream()
+                .filter(line -> line.getIssueId() == null)
                 .filter(line -> !line.getTestCases().isEmpty())
-                .count();
+                .collect(Collectors.toList());
+        Set<TestCase> testCases = new HashSet<>();
+        for (Line line :
+                relevant) {
+            testCases.addAll(line.getTestCases());
+        }
+        return testCases;
     }
 
-    long countPositivelyCoveredLines(Requirement requirement) {
-        return persistence.getRelevantLines().stream()
-                .filter(line ->
-                        line.getIssueId() != null &&
-                        persistence.getIssue(line.getIssueId()) != null &&
-                        persistence.getIssue(line.getIssueId()).getRequirement() != null &&
-                        persistence.getIssue(line.getIssueId()).getRequirement().equals(requirement))
-                .filter(line -> !line.getTestCases().isEmpty())
-                .filter(line -> line.getTestCases().stream()
-                        .allMatch(TestCase::isPositive))
-                .count();
-    }
-
-    long countLines(Requirement requirement) {
+    long countNotRelatedToIssueLines() {
         return persistence.getAllLines().stream()
-                .filter(line ->
-                        line.getIssueId() != null &&
-                        persistence.getIssue(line.getIssueId()) != null &&
-                        persistence.getIssue(line.getIssueId()).getRequirement() != null &&
-                        persistence.getIssue(line.getIssueId()).getRequirement().equals(requirement))
+                .filter(line -> line.getIssueId() == null)
                 .count();
     }
 
@@ -139,20 +155,15 @@ class StatisticsCalculator {
         return persistence.getAllLines().stream()
                 .filter(line ->
                         (line.getIssueId() != null &&
-                        persistence.getIssue(line.getIssueId()) != null &&
-                        persistence.getIssue(line.getIssueId()).getRequirement() == null) ||
-                        (line.getIssueId() == null))
+                                persistence.getIssue(line.getIssueId()) != null &&
+                                persistence.getIssue(line.getIssueId()).getRequirement() == null) ||
+                                (line.getIssueId() == null))
                 .count();
     }
 
-    long countNotRelatedToRequirementCoveredLines() {
+    long countNotRelatedToIssueRelevantLines() {
         return persistence.getRelevantLines().stream()
-                .filter(line ->
-                        (line.getIssueId() != null &&
-                        persistence.getIssue(line.getIssueId()) != null &&
-                        persistence.getIssue(line.getIssueId()).getRequirement() == null) ||
-                        (line.getIssueId() == null))
-                .filter(line -> !line.getTestCases().isEmpty())
+                .filter(line -> line.getIssueId() == null)
                 .count();
     }
 
@@ -160,28 +171,9 @@ class StatisticsCalculator {
         return persistence.getRelevantLines().stream()
                 .filter(line ->
                         (line.getIssueId() != null &&
-                        persistence.getIssue(line.getIssueId()) != null &&
-                        persistence.getIssue(line.getIssueId()).getRequirement() == null) ||
-                        (line.getIssueId() == null))
-                .count();
-    }
-
-    long countNotRelatedToRequirementPositivelyCoveredLines() {
-        return persistence.getRelevantLines().stream()
-                .filter(line ->
-                        (line.getIssueId() != null &&
-                        persistence.getIssue(line.getIssueId()) != null &&
-                        persistence.getIssue(line.getIssueId()).getRequirement() == null) ||
-                        (line.getIssueId() == null))
-                .filter(line -> !line.getTestCases().isEmpty())
-                .filter(line -> line.getTestCases().stream()
-                        .allMatch(TestCase::isPositive))
-                .count();
-    }
-
-    long countNotRelatedToIssueLines() {
-        return persistence.getAllLines().stream()
-                .filter(line -> line.getIssueId() == null)
+                                persistence.getIssue(line.getIssueId()) != null &&
+                                persistence.getIssue(line.getIssueId()).getRequirement() == null) ||
+                                (line.getIssueId() == null))
                 .count();
     }
 
@@ -192,9 +184,14 @@ class StatisticsCalculator {
                 .count();
     }
 
-    long countNotRelatedToIssueRelevantLines() {
+    long countNotRelatedToRequirementCoveredLines() {
         return persistence.getRelevantLines().stream()
-                .filter(line -> line.getIssueId() == null)
+                .filter(line ->
+                        (line.getIssueId() != null &&
+                                persistence.getIssue(line.getIssueId()) != null &&
+                                persistence.getIssue(line.getIssueId()).getRequirement() == null) ||
+                                (line.getIssueId() == null))
+                .filter(line -> !line.getTestCases().isEmpty())
                 .count();
     }
 
@@ -207,16 +204,16 @@ class StatisticsCalculator {
                 .count();
     }
 
-    Set<TestCase> getNotRelatedToIssuesTestCases() {
-        List<Line> relevant = persistence.getRelevantLines().stream()
-                .filter(line -> line.getIssueId() == null)
+    long countNotRelatedToRequirementPositivelyCoveredLines() {
+        return persistence.getRelevantLines().stream()
+                .filter(line ->
+                        (line.getIssueId() != null &&
+                                persistence.getIssue(line.getIssueId()) != null &&
+                                persistence.getIssue(line.getIssueId()).getRequirement() == null) ||
+                                (line.getIssueId() == null))
                 .filter(line -> !line.getTestCases().isEmpty())
-                .collect(Collectors.toList());
-        Set<TestCase> testCases = new HashSet<>();
-        for (Line line :
-                relevant) {
-            testCases.addAll(line.getTestCases());
-        }
-        return testCases;
+                .filter(line -> line.getTestCases().stream()
+                        .allMatch(TestCase::isPositive))
+                .count();
     }
 }
