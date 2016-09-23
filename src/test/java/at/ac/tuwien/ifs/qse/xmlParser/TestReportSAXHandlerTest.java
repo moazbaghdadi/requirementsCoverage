@@ -21,8 +21,7 @@ public class TestReportSAXHandlerTest {
 
     @Test
     public void testParsingReport() throws Exception {
-        ParserRunner parserRunner = new ParserRunner();
-        parserRunner.runXMLParser(handler, "src/test/resources/Test-org.testReport.xml");
+        ParserRunner.runXMLParser(handler, "src/test/resources/Test-org.testReport.xml");
 
         assertEquals(4, persistenceEntity.getTestCases().size());
         assertEquals(2, persistenceEntity.getTestCases().stream().

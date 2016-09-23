@@ -86,7 +86,6 @@ public class GitRepositoryAnalyser implements RepositoryAnalyser {
             for (int i = 0; i < rawText.size(); i++) {
                 line = new Line(i, file.getFileName());
 
-                line.setRevisionNumber(blameResult.getSourceCommit(i).getName());
                 line.setIssueId(getIssueId(blameResult.getSourceCommit(i).getName()));
                 persistence.addLine(line);
                 file.addLine(line);
@@ -97,7 +96,7 @@ public class GitRepositoryAnalyser implements RepositoryAnalyser {
         }
     }
 
-    private String getIssueId(String revisionId) throws GitAPIException, IOException {
+    private String getIssueId(String revision) throws GitAPIException, IOException {
         String issueId = null;
         Issue issue;
 
@@ -106,7 +105,7 @@ public class GitRepositoryAnalyser implements RepositoryAnalyser {
         Matcher matcher;
 
         Iterable<RevCommit> log = git.log().
-                add(git.getRepository().resolve(revisionId)).call();
+                add(git.getRepository().resolve(revision)).call();
 
         if (log.iterator().hasNext()) {
             RevCommit revCommit = log.iterator().next();
@@ -118,7 +117,6 @@ public class GitRepositoryAnalyser implements RepositoryAnalyser {
                 if (issue == null){
                     issue = new Issue(issueId);
                 }
-                issue.addRevisionId(revisionId);
                 persistence.addIssue(issue);
             }
         }

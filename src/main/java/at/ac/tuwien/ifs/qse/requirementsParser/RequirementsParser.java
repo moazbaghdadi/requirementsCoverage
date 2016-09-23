@@ -15,8 +15,7 @@ public class RequirementsParser {
     }
 
     public void parseRequirements() throws Exception {
-        ParserRunner parserRunner = new ParserRunner();
         RequirementsSAXHandler requirementsSAXHandler = new RequirementsSAXHandler(persistence);
-        parserRunner.runXMLParser(requirementsSAXHandler, persistence.getRequirementsPath());
+        ParserRunner.runXMLParser(requirementsSAXHandler, persistence.getRequirementsPath());
     }
 }

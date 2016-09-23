@@ -39,10 +39,8 @@ public class JaCoCoSAXHandlerTest {
 
     @Test
     public void testJaCoCoSAXHandler() throws Exception {
-        ParserRunner parserRunner = new ParserRunner();
-
-        parserRunner.runXMLParser(jaCoCoRelevanceSAXHandler, "src/test/resources/jacoco.xml");
-        parserRunner.runXMLParser(jaCoCoSAXHandler, "src/test/resources/jacoco.xml");
+        ParserRunner.runXMLParser(jaCoCoRelevanceSAXHandler, "src/test/resources/jacoco.xml");
+        ParserRunner.runXMLParser(jaCoCoSAXHandler, "src/test/resources/jacoco.xml");
 
         assertEquals(12, persistenceEntity.getAllLines().size());
         assertEquals(6, persistenceEntity.getRelevantLines().size());

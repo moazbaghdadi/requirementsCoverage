@@ -35,7 +35,6 @@ public class JaCoCo implements CodeCoverageTool {
         RemoteMavenRunner.runRemoteMaven(persistence.getTargetProjectPath() + "/pom.xml",
                 Arrays.asList("jacoco:report", "-q"));
 
-        ParserRunner parserRunner = new ParserRunner();
         JaCoCoRelevanceSAXHandler handler = new JaCoCoRelevanceSAXHandler(persistence);
         List<String> reports = new ArrayList<>();
         Files.walk(Paths.get(persistence.getTargetProjectPath())).forEach(filePath -> {
@@ -45,7 +44,7 @@ public class JaCoCo implements CodeCoverageTool {
         });
 
         LOGGER.info("parsing coverage report...");
-        parserRunner.runXMLParser(handler, reports);
+        ParserRunner.runXMLParser(handler, reports);
     }
 
     public void analyseCoverageReport(TestCase testCase) throws IOException, SAXException, MavenInvocationException {
@@ -59,7 +58,6 @@ public class JaCoCo implements CodeCoverageTool {
         RemoteMavenRunner.runRemoteMaven(persistence.getTargetProjectPath() + "/pom.xml",
                 Arrays.asList("jacoco:report", "-q"));
 
-        ParserRunner parserRunner = new ParserRunner();
         JaCoCoSAXHandler handler = new JaCoCoSAXHandler(persistence, testCase);
         List<String> reports = new ArrayList<>();
         Files.walk(Paths.get(persistence.getTargetProjectPath())).forEach(filePath -> {
@@ -69,6 +67,6 @@ public class JaCoCo implements CodeCoverageTool {
         });
 
         LOGGER.info("parsing coverage report...");
-        parserRunner.runXMLParser(handler, reports);
+        ParserRunner.runXMLParser(handler, reports);
     }
 }

@@ -246,7 +246,7 @@ public class ReportGenerator {
         double uncoveredPercentage = 100 * uncovered / (relevant!=0?(double)relevant:1);
         List<Issue> issues = new ArrayList<>(requirement.getIssues());
 
-        JFreeChart chart = createChart(requirement.getRequirementId(), positiveCoverage, negativeCoverage, uncoveredPercentage);
+        JFreeChart chart = createPieChart(requirement.getRequirementId(), positiveCoverage, negativeCoverage, uncoveredPercentage);
         ChartUtilities.saveChartAsJPEG(new File(PATH_TO_REQUIREMENTS + "/img/" + requirement.getRequirementId() + ".jpeg")
                 , chart, 300, 300);
 
@@ -304,7 +304,7 @@ public class ReportGenerator {
         String requirement = req!=null?req.getRequirementId():"Not Related To Requirement";
         List<TestCase> testCases = new ArrayList<>(statisticsCalculator.getTestCasesForIssue(issueId));
 
-        JFreeChart chart = createChart(issueId, positiveCoverage, negativeCoverage, uncoveredPercentage);
+        JFreeChart chart = createPieChart(issueId, positiveCoverage, negativeCoverage, uncoveredPercentage);
         ChartUtilities.saveChartAsJPEG(new File(PATH_TO_ISSUES + "/img/" + issueId + ".jpeg"), chart, 300, 300);
 
         writer.write("<h1 align=\"center\">" + issueId.toUpperCase() + "</h1>" +
@@ -361,7 +361,7 @@ public class ReportGenerator {
                 .filter(issue -> issue.getRequirement() == null)
                 .collect(Collectors.toList());
 
-        JFreeChart chart = createChart("not related to requirements", positiveCoverage, negativeCoverage, uncoveredPercentage);
+        JFreeChart chart = createPieChart("not related to requirements", positiveCoverage, negativeCoverage, uncoveredPercentage);
         ChartUtilities.saveChartAsJPEG(new File(PATH_TO_REQUIREMENTS + "/img/notRelatedToRequirements.jpeg"), chart, 300, 300);
 
         writer.write("<h1 align=\"center\">NOT RELATED TO REQUIREMENT</h1>" +
@@ -417,7 +417,7 @@ public class ReportGenerator {
         double uncoveredPercentage = 100 * uncovered / (relevant!=0?(double)relevant:1);
         List<TestCase> testCases = new ArrayList<>(statisticsCalculator.getNotRelatedToIssuesTestCases());
 
-        JFreeChart chart = createChart("not related to issue", positiveCoverage, negativeCoverage, uncoveredPercentage);
+        JFreeChart chart = createPieChart("not related to issue", positiveCoverage, negativeCoverage, uncoveredPercentage);
         ChartUtilities.saveChartAsJPEG(new File(PATH_TO_ISSUES + "/img/notRelatedToIssue.jpeg"), chart, 300, 300);
 
         writer.write("<h1 align=\"center\">Not Related To Issue</h1>" +
@@ -468,7 +468,7 @@ public class ReportGenerator {
         double negativeCoverage = 100 * (covered-positive) / (relevant!=0?(double)relevant:1);
         double uncoveredPercentage = 100 * uncovered / (relevant!=0?(double)relevant:1);
 
-        JFreeChart chart = createChart("not related to issue", positiveCoverage, negativeCoverage, uncoveredPercentage);
+        JFreeChart chart = createPieChart("not related to issue", positiveCoverage, negativeCoverage, uncoveredPercentage);
         ChartUtilities.saveChartAsJPEG(new File(PATH_TO_REPORT + "/projectCoverage.jpeg"), chart, 300, 300);
 
         writer.write("<h1 align=\"center\">Project Name</h1>");
@@ -536,10 +536,10 @@ public class ReportGenerator {
      * @param uncoveredPercentage Percentage of the lines uncovered by test cases.
      * @return the generated pie chart.
      */
-    private JFreeChart createChart(String title,
-                                   double positiveCoverage,
-                                   double negativeCoverage,
-                                   double uncoveredPercentage) {
+    private JFreeChart createPieChart(String title,
+                                      double positiveCoverage,
+                                      double negativeCoverage,
+                                      double uncoveredPercentage) {
         DefaultPieDataset dataSet = new DefaultPieDataset();
         dataSet.setValue("relevant lines covered by positive tests", positiveCoverage);
         dataSet.setValue("relevant lines covered by negative tests", negativeCoverage);

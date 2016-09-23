@@ -4,14 +4,15 @@ import at.ac.tuwien.ifs.qse.model.Issue;
 import at.ac.tuwien.ifs.qse.model.Requirement;
 import at.ac.tuwien.ifs.qse.persistence.Persistence;
 import at.ac.tuwien.ifs.qse.persistence.PersistenceEntity;
-import junit.framework.TestCase;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 /**
  * Tests the class RequirementsSAXHandler
  */
-public class RequirementsSAXHandlerTest extends TestCase {
+public class RequirementsSAXHandlerTest {
 
     private Persistence persistence;
     private RequirementsSAXHandler requirementsSAXHandler;
@@ -34,9 +35,7 @@ public class RequirementsSAXHandlerTest extends TestCase {
 
     @Test
     public void testRequirementsSAXHandler() throws Exception {
-        ParserRunner parserRunner = new ParserRunner();
-
-        parserRunner.runXMLParser(requirementsSAXHandler, "src/test/resources/requirements.xml");
+        ParserRunner.runXMLParser(requirementsSAXHandler, "src/test/resources/requirements.xml");
 
         assertEquals(10, persistence.getIssues().size());
         assertEquals(3, persistence.getRequirements().size());

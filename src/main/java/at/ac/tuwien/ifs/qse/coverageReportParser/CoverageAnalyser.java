@@ -84,7 +84,6 @@ public class CoverageAnalyser {
         RemoteMavenRunner.runRemoteMaven(persistence.getTargetProjectPath() + "/pom.xml",
                 Arrays.asList("clean", "test", "-q", "-fn", "-fae", "-DfailIfNoTests=false"));
 
-        ParserRunner parserRunner = new ParserRunner();
         TestReportSAXHandler handler = new TestReportSAXHandler(persistence);
         List<String> reports = new ArrayList<>();
         Files.walk(Paths.get(persistence.getTargetProjectPath())).forEach(filePath -> {
@@ -93,7 +92,7 @@ public class CoverageAnalyser {
             }
         });
 
-        parserRunner.runXMLParser(handler, reports);
+        ParserRunner.runXMLParser(handler, reports);
     }
 
 }

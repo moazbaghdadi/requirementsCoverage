@@ -1,7 +1,7 @@
 package at.ac.tuwien.ifs.qse.model;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Represents a file.
@@ -9,11 +9,11 @@ import java.util.List;
 public class File {
 
     private String fileName;
-    private List<Line> lines;
+    private Set<Line> lines;
 
     public File(String fileName) {
         this.fileName = fileName;
-        this.lines = new ArrayList<>();
+        this.lines = new HashSet<>();
     }
 
     public String getFileName() {
@@ -24,7 +24,7 @@ public class File {
         this.fileName = fileName;
     }
 
-    public List<Line> getLines() {
+    public Set<Line> getLines() {
         return lines;
     }
 

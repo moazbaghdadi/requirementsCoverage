@@ -24,11 +24,11 @@ public class PersistenceEntity implements Persistence {
 
     public PersistenceEntity(String targetRepositoryPath,
                              String targetProjectPath,
-                             String commitsRegEx,
+                             String issueIdsRegEx,
                              String requirementsPath) {
         this.targetRepositoryPath = targetRepositoryPath;
         this.targetProjectPath = targetProjectPath;
-        this.issueIdsRegEx = commitsRegEx;
+        this.issueIdsRegEx = issueIdsRegEx;
         this.requirementsPath = requirementsPath;
         this.showWarning = false;
 

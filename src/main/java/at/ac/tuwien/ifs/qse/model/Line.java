@@ -1,7 +1,7 @@
 package at.ac.tuwien.ifs.qse.model;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Represents a line of code.
@@ -10,14 +10,13 @@ public class Line {
 
     private int lineNumber;
     private String fileName;
-    private String revisionNumber;
     private String issueId;
-    private List<TestCase> testCases;
+    private Set<TestCase> testCases;
 
     public Line(int lineNumber, String fileName) {
         this.lineNumber = lineNumber;
         this.fileName = fileName;
-        this.testCases = new ArrayList<>();
+        this.testCases = new HashSet<>();
     }
 
     public int getLineNumber() {
@@ -36,15 +35,7 @@ public class Line {
         this.fileName = fileName;
     }
 
-    public String getRevisionNumber() {
-        return revisionNumber;
-    }
-
-    public void setRevisionNumber(String revisionNumber) {
-        this.revisionNumber = revisionNumber;
-    }
-
-    public List<TestCase> getTestCases() {
+    public Set<TestCase> getTestCases() {
         return testCases;
     }
 

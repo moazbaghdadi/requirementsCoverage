@@ -17,6 +17,7 @@ public class TestReportSAXHandler extends DefaultHandler {
         this.persistence = persistence;
     }
 
+    @Override
     public void startElement (String namespaceURI,
                               String localName,
                               String qualifiedName,
@@ -24,9 +25,16 @@ public class TestReportSAXHandler extends DefaultHandler {
         if (qualifiedName.equals("testcase")){
             String testCaseName = attributes.getValue("classname") + "#" + attributes.getValue("name");
             testCase = new TestCase(testCaseName, true);
-            persistence.addTestCase(testCase);
         } else if (qualifiedName.equals("failure")){
             testCase.setPositive(false);
+        }
+    }
+
+    @Override
+    public void endElement (String namespaceURI,
+                            String localName,
+                            String qualifiedName) throws SAXException {
+        if (qualifiedName.equals("testcase")){
             persistence.addTestCase(testCase);
         }
     }
