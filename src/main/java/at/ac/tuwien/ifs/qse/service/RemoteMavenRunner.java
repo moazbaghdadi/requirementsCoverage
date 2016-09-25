@@ -27,7 +27,10 @@ public class RemoteMavenRunner {
         request.setGoals(goals);
         invoker.setMavenHome(detectMavenHome());
 
-        invoker.execute(request);
+        InvocationResult result = invoker.execute(request);
+        if (result.getExitCode() != 0){
+            throw new MavenInvocationException("executing maven goals failed", result.getExecutionException());
+        }
     }
 
     /**
