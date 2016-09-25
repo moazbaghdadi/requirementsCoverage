@@ -26,9 +26,9 @@ public class RequirementsSAXHandler extends DefaultHandler {
         if (qualifiedName.equals("requirement")){
             requirement = new Requirement(attributes.getValue("name"));
         } else if (qualifiedName.equals("issue")){
-            Issue issue = persistence.getIssue(attributes.getValue("name"));
+            Issue issue = persistence.getIssue(attributes.getValue("id"));
             if (issue == null) {
-                issue = new Issue(attributes.getValue("name"));
+                issue = new Issue(attributes.getValue("id"));
             }
             issue.setRequirement(requirement);
             persistence.addIssue(issue);
