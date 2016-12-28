@@ -12,10 +12,12 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Generates for each test case a code coverage report and
@@ -58,6 +60,7 @@ public class CoverageAnalyser {
         LOGGER.info("analyzing coverage reports...");
         int numberOfTests = persistence.getTestCases().size();
         int current = 1;
+
         for (TestCase testCase : persistence.getTestCases()) {
             try {
                 LOGGER.info("analysing report for test case " + current++ + "/" + numberOfTests);
@@ -85,12 +88,12 @@ public class CoverageAnalyser {
                 Arrays.asList("clean", "test", "-q", "-fn", "-fae", "-DfailIfNoTests=false"));
 
         TestReportSAXHandler handler = new TestReportSAXHandler(persistence);
-        List<String> reports = new ArrayList<>();
-        Files.walk(Paths.get(persistence.getTargetProjectPath())).forEach(filePath -> {
-            if (Files.isRegularFile(filePath) && filePath.toString().matches(".*surefire-reports.*TEST.*xml")) {
-                reports.add(filePath.toString());
-            }
-        });
+        List<String> reports =
+                Files.walk(Paths.get(persistence.getTargetProjectPath()))
+                        .filter(filePath -> Files.isRegularFile(filePath))
+                        .filter(filePath -> filePath.toString().matches(".*surefire-reports.*TEST.*xml"))
+                        .map(Path::toString)
+                        .collect(Collectors.toList());
 
         ParserRunner.runXMLParser(handler, reports);
     }
