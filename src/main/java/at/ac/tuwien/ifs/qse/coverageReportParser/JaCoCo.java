@@ -13,10 +13,11 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class JaCoCo implements CodeCoverageTool {
     private static final Logger LOGGER = LoggerFactory.getLogger(JaCoCo.class);
@@ -27,31 +28,25 @@ public class JaCoCo implements CodeCoverageTool {
     }
 
     public void analyseRelevantLines() throws IOException, SAXException, MavenInvocationException {
-        LOGGER.info("running maven goal: mvn clean test -q -DfailIfNoTests=false");
+        LOGGER.info("running maven goal: mvn clean test -fn -fae -q -DfailIfNoTests=false");
         RemoteMavenRunner.runRemoteMaven(persistence.getTargetProjectPath() + "/pom.xml",
-                Arrays.asList("clean", "test", "-q", "-DfailIfNoTests=false"));
+                Arrays.asList("clean", "test", "-fn", "-fae", "-q", "-DfailIfNoTests=false"));
 
         LOGGER.info("running maven goal: jacoco:report -q");
         RemoteMavenRunner.runRemoteMaven(persistence.getTargetProjectPath() + "/pom.xml",
                 Arrays.asList("jacoco:report", "-q"));
 
         JaCoCoRelevanceSAXHandler handler = new JaCoCoRelevanceSAXHandler(persistence);
-        List<String> reports = new ArrayList<>();
-        Files.walk(Paths.get(persistence.getTargetProjectPath())).forEach(filePath -> {
-            if (Files.isRegularFile(filePath) && filePath.toString().matches(".*target.*site.*jacoco.*jacoco.xml")) {
-                reports.add(filePath.toString());
-            }
-        });
 
         LOGGER.info("parsing coverage report...");
-        ParserRunner.runXMLParser(handler, reports);
+        ParserRunner.runXMLParser(handler, getReports());
     }
 
     public void analyseCoverageReport(TestCase testCase) throws IOException, SAXException, MavenInvocationException {
-        LOGGER.info("running maven goal: mvn clean test -q -Dtest=\"" + testCase.getTestCaseName() +
+        LOGGER.info("running maven goal: mvn clean test -fn -fae -q -Dtest=\"" + testCase.getTestCaseName() +
                 "\" -DfailIfNoTests=false");
         RemoteMavenRunner.runRemoteMaven(persistence.getTargetProjectPath() + "/pom.xml",
-                Arrays.asList("clean", "test", "-q", "-Dtest=\"" + testCase.getTestCaseName()
+                Arrays.asList("clean", "test", "-fn", "-fae","-q", "-Dtest=\"" + testCase.getTestCaseName()
                         + "\"", "-DfailIfNoTests=false"));
 
         LOGGER.info("running maven goal: jacoco:report -q");
@@ -59,14 +54,15 @@ public class JaCoCo implements CodeCoverageTool {
                 Arrays.asList("jacoco:report", "-q"));
 
         JaCoCoSAXHandler handler = new JaCoCoSAXHandler(persistence, testCase);
-        List<String> reports = new ArrayList<>();
-        Files.walk(Paths.get(persistence.getTargetProjectPath())).forEach(filePath -> {
-            if (Files.isRegularFile(filePath) && filePath.toString().matches(".*target.*site.*jacoco.*jacoco.xml")) {
-                reports.add(filePath.toString());
-            }
-        });
 
         LOGGER.info("parsing coverage report...");
-        ParserRunner.runXMLParser(handler, reports);
+        ParserRunner.runXMLParser(handler, getReports());
+    }
+
+    private List<String> getReports() throws IOException {
+        return Files.walk(Paths.get(persistence.getTargetProjectPath()))
+                .filter(filePath -> Files.isRegularFile(filePath))
+                .map(Path::toString)
+                .collect(Collectors.toList());
     }
 }
