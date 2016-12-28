@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,38 +27,29 @@ public class GitRepositoryAnalyser implements RepositoryAnalyser {
     private static final Logger LOGGER = LoggerFactory.getLogger(GitRepositoryAnalyser.class);
     private Persistence persistence;
     private Git git;
+    private int failuresCounter;
+    private List<Throwable> exceptions;
+
 
     public GitRepositoryAnalyser(Persistence persistence, Repository repository) {
         this.persistence = persistence;
         this.git = new Git(repository);
+
+        this.exceptions = new ArrayList<>();
+        this.failuresCounter = 0;
     }
 
     public void analyseRepository() {
         LOGGER.info("parsing repository...");
-        int failuresCounter = 0;
-        List<Throwable> exceptions = new ArrayList<>();
 
-        List<String> projectFiles = new ArrayList<>();
         try {
-            Files.walk(Paths.get(persistence.getTargetProjectPath())).forEach(filePath -> {
-                if (Files.isRegularFile(filePath) && filePath.toString().matches(".*java\\b")) {
-                    projectFiles.add(filePath.toString().substring(persistence.getTargetRepositoryPath().length()+1).replace("\\", "/"));
-                }
-            });
+            Files.walk(Paths.get(persistence.getTargetProjectPath()))
+                    .filter(Files::isRegularFile)
+                    .filter(filePath -> filePath.toString().matches(".*java\\b"))
+                    .map(this::getLocalFilePath)
+                    .forEach(this::getLinesInfoSafely);
         } catch (IOException e) {
-            failuresCounter ++;
-            exceptions.add(e);
-            persistence.setShowWarning(true);
-        }
-        for (String filePath :
-                projectFiles) {
-            try {
-                getLinesInfo(filePath);
-            } catch (GitAPIException | IOException e) {
-                failuresCounter ++;
-                exceptions.add(e);
-                persistence.setShowWarning(true);
-            }
+            handleException(e);
         }
 
         if (failuresCounter != 0) {
@@ -67,12 +59,25 @@ public class GitRepositoryAnalyser implements RepositoryAnalyser {
         }
     }
 
+    private void getLinesInfoSafely(String filePath) {
+        try{
+            getLinesInfo(filePath);
+        } catch (Exception e) {
+            handleException(e);
+        }
+    }
+
+    private String getLocalFilePath(Path filePath) {
+        return filePath.toString()
+                .substring(persistence.getTargetRepositoryPath().length()+1)
+                .replace("\\", "/");
+    }
+
     private void getLinesInfo(String filePath) throws GitAPIException, IOException {
         BlameCommand blameCommand = git.blame();
         blameCommand = blameCommand.setStartCommit(git.getRepository().resolve("HEAD"));
         blameCommand = blameCommand.setFilePath(filePath);
         BlameResult blameResult  = blameCommand.call();
-
         Line line;
 
         File file = persistence.getFile(filePath.replace("/", "."));
@@ -82,7 +87,6 @@ public class GitRepositoryAnalyser implements RepositoryAnalyser {
 
         try {
             RawText rawText = blameResult.getResultContents();
-
             for (int i = 0; i < rawText.size(); i++) {
                 line = new Line(i, file.getFileName());
 
@@ -123,4 +127,9 @@ public class GitRepositoryAnalyser implements RepositoryAnalyser {
         return issueId;
     }
 
+    private void handleException(Exception e) {
+        failuresCounter ++;
+        exceptions.add(e);
+        persistence.setShowWarning(true);
+    }
 }
