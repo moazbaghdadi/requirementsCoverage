@@ -7,7 +7,7 @@ import at.ac.tuwien.ifs.qse.persistence.PersistenceEntity;
 import at.ac.tuwien.ifs.qse.reportGenerator.ReportGenerator;
 import at.ac.tuwien.ifs.qse.repositoryAnalyser.GitRepositoryAnalyser;
 import at.ac.tuwien.ifs.qse.repositoryAnalyser.RepositoryAnalyser;
-import at.ac.tuwien.ifs.qse.requirementsParser.RequirementsParser;
+import at.ac.tuwien.ifs.qse.requirementsParser.JiraRequirementsParser;
 import at.ac.tuwien.ifs.qse.service.RemoteMavenRunner;
 import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.eclipse.jgit.lib.Repository;
@@ -70,9 +70,9 @@ public class RequirementsCoverageLauncher
 
         // parse Requirements ----------------------------
         LOGGER.info("parsing requirements...");
-        RequirementsParser requirementsParser = new RequirementsParser(persistence);
+        JiraRequirementsParser jiraRequirementsParser = new JiraRequirementsParser(persistence);
         try {
-            requirementsParser.parseRequirements();
+            jiraRequirementsParser.parseRequirements();
         } catch (Exception e) {
             LOGGER.error("an error occurred while parsing requirements: ", e);
             persistence.setShowWarning(true);
