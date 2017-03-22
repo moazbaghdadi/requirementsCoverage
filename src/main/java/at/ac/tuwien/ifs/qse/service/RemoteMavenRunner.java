@@ -26,11 +26,11 @@ public class RemoteMavenRunner {
         request.setPomFile(new File(pathToPomFile));
         request.setGoals(goals);
         invoker.setMavenHome(detectMavenHome());
-
-        InvocationResult result = invoker.execute(request);
+        invoker.execute(request);
+        /*InvocationResult result =
         if (result.getExitCode() != 0){
             throw new MavenInvocationException("executing maven goals failed", result.getExecutionException());
-        }
+        }*/
     }
 
     /**

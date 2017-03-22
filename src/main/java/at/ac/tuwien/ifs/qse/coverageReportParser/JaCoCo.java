@@ -62,6 +62,7 @@ public class JaCoCo implements CodeCoverageTool {
     private List<String> getReports() throws IOException {
         return Files.walk(Paths.get(persistence.getTargetProjectPath()))
                 .filter(filePath -> Files.isRegularFile(filePath))
+                .filter(filePath -> filePath.toString().matches(".*target.*site.*jacoco.*jacoco.xml"))
                 .map(Path::toString)
                 .collect(Collectors.toList());
     }
