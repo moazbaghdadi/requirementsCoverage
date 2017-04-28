@@ -17,7 +17,7 @@ After a successful run of the previous command the program can be started with n
 
 ## Starting the Project:
 The following command runs the project 
-`mvn exec:java -Dexec.mainClass=at.ac.tuwien.ifs.qse.RequirementsCoverageLauncher -Dexec.args="*arg1 arg2 arg3 arg4*"`.
+`mvn exec:java -Dexec.mainClass=at.ac.tuwien.ifs.qse.RequirementsCoverageLauncher -Dexec.args="arg1 arg2 arg3 arg4"`.
 
 where:
 * arg1: the path to the target project directory (where the .git/ folder exists)
