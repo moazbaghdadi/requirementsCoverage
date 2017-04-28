@@ -6,8 +6,8 @@ the machine running the program should be running on windows and have the follow
 ## Conditions of the target project:
 The target project should be:
 * a java project.
-* using Maven as a build manager tool.
-* using Git as a version management system.
+* using Maven as a build managment tool.
+* using [Git](https://git-scm.com/) as a version management system.
 * having the [JaCoCo](http://www.eclemma.org/jacoco/) library configured as a dependency in the target project and runnable over maven.
 * having a .xml file that includes the relation between the requirements and the issues.
 
