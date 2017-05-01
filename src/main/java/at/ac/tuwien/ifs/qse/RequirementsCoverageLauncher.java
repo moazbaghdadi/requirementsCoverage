@@ -7,7 +7,7 @@ import at.ac.tuwien.ifs.qse.persistence.PersistenceEntity;
 import at.ac.tuwien.ifs.qse.reportGenerator.ReportGenerator;
 import at.ac.tuwien.ifs.qse.repositoryAnalyser.GitRepositoryAnalyser;
 import at.ac.tuwien.ifs.qse.repositoryAnalyser.RepositoryAnalyser;
-import at.ac.tuwien.ifs.qse.requirementsParser.JiraRequirementsParser;
+import at.ac.tuwien.ifs.qse.requirementsParser.SimpleRequirementsParser;
 import at.ac.tuwien.ifs.qse.service.RemoteMavenRunner;
 import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.eclipse.jgit.lib.Repository;
@@ -53,6 +53,7 @@ public class RequirementsCoverageLauncher
             LOGGER.error("an error occurred while executing mvn clean: ", e);
             return;
         }
+        long cleaningTime = System.currentTimeMillis();
         // -----------------------------------------------
 
         // parse repository ------------------------------
@@ -65,21 +66,19 @@ public class RequirementsCoverageLauncher
         gitRepositoryAnalyser.analyseRepository();
 
         long repoEndTime = System.currentTimeMillis();
-        LOGGER.info("repository parsed, elapsed time: " + ((repoEndTime - startTime)/ 1000d) + " sec.");
         // -----------------------------------------------
 
         // parse Requirements ----------------------------
         LOGGER.info("parsing requirements...");
-        JiraRequirementsParser jiraRequirementsParser = new JiraRequirementsParser(persistence);
+        SimpleRequirementsParser requirementsParser = new SimpleRequirementsParser(persistence);
         try {
-            jiraRequirementsParser.parseRequirements();
+            requirementsParser.parseRequirements();
         } catch (Exception e) {
             LOGGER.error("an error occurred while parsing requirements: ", e);
             persistence.setShowWarning(true);
         }
         LOGGER.info(persistence.toString());
         long requirementsEndTime = System.currentTimeMillis();
-        LOGGER.info("requirements parsed, elapsed time: " + ((requirementsEndTime - repoEndTime)/ 1000d) + " sec.");
         // -----------------------------------------------
 
         // parse test and coverage reports ---------------
@@ -87,7 +86,6 @@ public class RequirementsCoverageLauncher
         coverageAnalyser.analyzeCoverage();
 
         long parsingEndTime = System.currentTimeMillis();
-        LOGGER.info("test and coverage reports parsed, elapsed time " + ((parsingEndTime - requirementsEndTime )/ 60000d) + " min.");
         // -----------------------------------------------
 
         // generate report -------------------------------
@@ -95,9 +93,13 @@ public class RequirementsCoverageLauncher
         reportGenerator.generateReport();
 
         long statisticsEndTime = System.currentTimeMillis();
-        LOGGER.info("requirements coverage report generated, elapsed time: " + ((statisticsEndTime - parsingEndTime)/ 1000d) + " sec.");
         // -----------------------------------------------
 
+        LOGGER.info("project cleaned, elapsed time: " + ((cleaningTime - startTime)/ 1000d) + " sec.");
+        LOGGER.info("repository parsed, elapsed time: " + ((repoEndTime - cleaningTime)/ 1000d) + " sec.");
+        LOGGER.info("requirements parsed, elapsed time: " + ((requirementsEndTime - repoEndTime)/ 1000d) + " sec.");
+        LOGGER.info("test and coverage reports parsed, elapsed time " + ((parsingEndTime - requirementsEndTime )/ 60000d) + " min.");
+        LOGGER.info("requirements coverage report generated, elapsed time: " + ((statisticsEndTime - parsingEndTime)/ 1000d) + " sec.");
         LOGGER.info("total elapsed time: " + ((statisticsEndTime - startTime)/ 60000d) + " min.");
 
     }
