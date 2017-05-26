@@ -232,4 +232,7 @@ public interface Persistence {
      */
     boolean showWarning();
 
+    void setProjectName(String projectName);
+
+    String getProjectName();
 }

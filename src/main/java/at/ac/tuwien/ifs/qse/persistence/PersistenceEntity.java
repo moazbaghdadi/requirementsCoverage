@@ -22,6 +22,8 @@ public class PersistenceEntity implements Persistence {
     private String requirementsPath;
     private boolean showWarning;
 
+    private String projectName;
+
     public PersistenceEntity(String targetRepositoryPath,
                              String targetProjectPath,
                              String issueIdsRegEx,
@@ -216,6 +218,16 @@ public class PersistenceEntity implements Persistence {
     @Override
     public boolean showWarning() {
         return showWarning;
+    }
+
+    @Override
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
+    }
+
+    @Override
+    public String getProjectName() {
+        return projectName;
     }
 
     @Override

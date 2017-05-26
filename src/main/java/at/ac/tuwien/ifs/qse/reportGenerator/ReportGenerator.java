@@ -471,7 +471,7 @@ public class ReportGenerator {
         JFreeChart chart = createPieChart("not related to issue", positiveCoverage, negativeCoverage, uncoveredPercentage);
         ChartUtilities.saveChartAsJPEG(new File(PATH_TO_REPORT + "/projectCoverage.jpeg"), chart, 300, 300);
 
-        writer.write("<h1 align=\"center\">Project Name</h1>");
+        writer.write("<h1 align=\"center\">" + persistence.getProjectName() + "</h1>");
         writer.write("<div class=\"statistics-main left\">\n" +
                 "    <h2>Overall Statistics:</h2>\n" +
                 "    <ul>\n" +

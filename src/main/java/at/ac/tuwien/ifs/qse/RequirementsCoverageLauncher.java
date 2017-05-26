@@ -4,6 +4,7 @@ import at.ac.tuwien.ifs.qse.coverageReportParser.CoverageAnalyser;
 import at.ac.tuwien.ifs.qse.coverageReportParser.JaCoCo;
 import at.ac.tuwien.ifs.qse.persistence.Persistence;
 import at.ac.tuwien.ifs.qse.persistence.PersistenceEntity;
+import at.ac.tuwien.ifs.qse.projectNameParser.ProjectNameParser;
 import at.ac.tuwien.ifs.qse.reportGenerator.ReportGenerator;
 import at.ac.tuwien.ifs.qse.repositoryAnalyser.GitRepositoryAnalyser;
 import at.ac.tuwien.ifs.qse.repositoryAnalyser.RepositoryAnalyser;
@@ -44,6 +45,13 @@ public class RequirementsCoverageLauncher
                 requirementsPath
         );
         // -----------------------------------------------
+
+        ProjectNameParser projectNameParser = new ProjectNameParser(persistence);
+        try {
+            projectNameParser.parseProjectName();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         // clean project ---------------------------------
         try {
